@@ -1,5 +1,5 @@
 #include <signal.h>
-#include "romasynthi.h"
+#include "osc_synth.h"
 
 // while exit condition
 bool done = false;
@@ -15,7 +15,7 @@ void exitSigHandler(int s) {
 int main(int argc, char *argv[]) {
     
     // create synthesizer object/client
-    RoMaSynthi *synth = new RoMaSynthi();
+    OSCSynth *synth = new OSCSynth();
 
     // activate the client
     synth->start();

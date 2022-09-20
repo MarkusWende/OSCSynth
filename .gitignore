@@ -1,6 +1,6 @@
 # Executables and Objects
-RoMaSynth
-RoMaSynth.exe
+OSCSynth
+OSCSynth.exe
 obj/
 obj/*
 

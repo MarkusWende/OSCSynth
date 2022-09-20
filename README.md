@@ -1,5 +1,5 @@
-# RoMaSynthesizer :musical_keyboard:
-The RoMaSythesizer is a polyphone software synthesizer written in C++, which generates sound 
+# OSCSynth :musical_keyboard:
+The OSCSynth is a polyphone software synthesizer written in C++, which generates sound 
 in a combination of additive and subtractive synthesis. The software is part of 
 a project at [TU Berlin](http://www.ak.tu-berlin.de) in the seminar 
 [Klangsynthese](https://gitlab.tubit.tu-berlin.de/henrikvoncoler/Klangsynthese_PI). 
@@ -28,7 +28,7 @@ and the sample rate is ```48kHz```. This might differ
 from your system and you are free to find the right jack settings.
 
 ## Open Sound Control
-The RoMaSynthesizer can be controlled via OSC. We use the app [TouchOSC](https://hexler.net/software/touchosc) by 
+The OSCSynthesizer can be controlled via OSC. We use the app [TouchOSC](https://hexler.net/software/touchosc) by 
 Hexler, which is available in the Android and iOS Appstores.
 Alternativley the [Pure Data](https://puredata.info/downloads/pd-extended) file in ./osc can be used to control the parameters. 
 Make sure you have installed pd-extended with the ```mrpeach``` modul included, otherwise 
@@ -46,14 +46,14 @@ next steps.
 * Download / Clone the Repository:
 
 ```javascript
-    git clone git@gitlab.tubit.tu-berlin.de:markus.wende/RoMa_Synthesizer_One.git
+    git clone git@gitlab.tubit.tu-berlin.de:markus.wende/OSC_Synthesizer_One.git
 ```
 * (Optional) if you downloaded as a .zip file, unzip the archiv
 
 * Go into the folder:
 
 ```javascript
-    cd RoMa_Synthesizer_One*
+    cd OSC_Synthesizer_One*
 ```
 * Compile the source code:
 
@@ -66,20 +66,20 @@ If you want to start the synthesizer, make sure you are in the folder you
 compiled it. If you want global access to the synthesizer you have to add the 
 program to your PATH variable. In the terminal type: 
 ```javascript
-    export PATH=$PATH:/path/to/my/RoMaSynthi
+    export PATH=$PATH:/path/to/my/OSCSynth
 ```
 And make sure you changed the path to the right one. 
 
 Now you can run the synthesizer from the command line by:
 
 ```javascript
-    RoMaSynth
+    OSCSynth
 ```
 
 If you have exported the program to your PATH, or by:
 
 ```javascript
-    ./RoMaSynth
+    ./OSCSynth
 ```
 
 If you are still in the compile directory. If everything works fine you should 

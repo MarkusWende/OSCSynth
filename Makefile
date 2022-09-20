@@ -10,7 +10,7 @@ OBJDIR = obj
 SRC = $(wildcard $(SRCDIR)/*.cpp)
 OBJ = $(addprefix $(OBJDIR)/,$(notdir $(SRC:.cpp=.o)))
 
-EXEC = RoMaSynth
+EXEC = OSCSynth
 
 all: $(EXEC)
 

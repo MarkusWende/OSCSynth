@@ -1,5 +1,4 @@
-#ifndef ROMASYNTHI_H
-#define ROMASYNTHI_H
+#pragma once
 
 #include <jackaudioio.hpp>
 #include <algorithm>
@@ -27,7 +26,7 @@ enum presetnumber{
 };
 
 
-class RoMaSynthi: public JackCpp::AudioIO {
+class OSCSynthi: public JackCpp::AudioIO {
 
 private:
 
@@ -70,7 +69,7 @@ public:
                               audioBufVector outBufs); 
 
     /// Constructor
-    RoMaSynthi();
+	OSCSynth();
 
 	// Setters
 	
@@ -90,5 +89,3 @@ public:
 	void setAllADSRDecayTime(double val);
 
 };
-
-#endif // ROMASYNTHI_H

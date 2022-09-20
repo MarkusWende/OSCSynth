@@ -1,12 +1,12 @@
-// Romasynth Class
+// OSCSynth Class
 // In this class all oscillators and filter obejcts are created
 // Midi handling and OSC handling happens here
 // Callback function of the jack client is loaded with output buffers here as well
 
-#include "romasynthi.h"
+#include "osc_synth.h"
 
 
-RoMaSynthi::RoMaSynthi() : JackCpp::AudioIO("RoMaSynthi", 0,1) {
+OSCSynthi::OSCSynth() : JackCpp::AudioIO("OSCSynth", 0,1) {
 	reserveInPorts(2);
 	reserveOutPorts(2);
 
@@ -69,7 +69,7 @@ RoMaSynthi::RoMaSynthi() : JackCpp::AudioIO("RoMaSynthi", 0,1) {
 
     /// Audio Callback Function:
     /// - the output buffers are filled here
-int RoMaSynthi::audioCallback(jack_nframes_t nframes,
+int OSCSynth::audioCallback(jack_nframes_t nframes,
                               // A vector of pointers to each input port.
                               audioBufVector inBufs,
                               // A vector of pointers to each output port.
@@ -113,7 +113,7 @@ int RoMaSynthi::audioCallback(jack_nframes_t nframes,
 
 // The Midi Handler receives messages from the midi manager
 // all note on and note off handling happens here
-void RoMaSynthi::midiHandler() {
+void OSCSynth::midiHandler() {
 
 
       	/// process midi messages
@@ -241,7 +241,7 @@ void RoMaSynthi::midiHandler() {
 
 
 // OSC Handler receives messegas from OSC manager and hands them over to Setters
-void RoMaSynthi::oscHandler() {
+void OSCSynth::oscHandler() {
 
   	double val;
 
@@ -358,7 +358,7 @@ void RoMaSynthi::oscHandler() {
 
 // These functions help to make changes to all created note (osci)-objects
 
-void RoMaSynthi::setAllSineAmpl(double val) {
+void OSCSynth::setAllSineAmpl(double val) {
 
 	osci[0]->setSineAmpl(val);
 	osci[1]->setSineAmpl(val);
@@ -369,7 +369,7 @@ void RoMaSynthi::setAllSineAmpl(double val) {
 	osci[6]->setSineAmpl(val);
 }
 
-void RoMaSynthi::setAllSawAmpl(double val){
+void OSCSynth::setAllSawAmpl(double val){
 
 	osci[0]->setSawAmpl(val);
 	osci[1]->setSawAmpl(val);
@@ -380,7 +380,7 @@ void RoMaSynthi::setAllSawAmpl(double val){
 	osci[6]->setSawAmpl(val);
 }
 
-void RoMaSynthi::setAllSquareAmpl(double val) {
+void OSCSynth::setAllSquareAmpl(double val) {
 
 	osci[0]->setSquareAmpl(val);
 	osci[1]->setSquareAmpl(val);
@@ -391,7 +391,7 @@ void RoMaSynthi::setAllSquareAmpl(double val) {
 	osci[6]->setSquareAmpl(val);
 }
 
-void RoMaSynthi::setAllNoiseAmpl(double val) {
+void OSCSynth::setAllNoiseAmpl(double val) {
 
 	val=val*0.5;
 	osci[0]->setNoiseAmpl(val);
@@ -403,7 +403,7 @@ void RoMaSynthi::setAllNoiseAmpl(double val) {
 	osci[6]->setNoiseAmpl(val);
 }
 
-void RoMaSynthi::setAllADSRStatus(int val) {
+void OSCSynth::setAllADSRStatus(int val) {
 
 	if (val == 1) {
 		osci[0]->setADSRStatus(true);
@@ -425,7 +425,7 @@ void RoMaSynthi::setAllADSRStatus(int val) {
 	}
 }
 
-void RoMaSynthi::setAllADSRSustainLevel(double val) {
+void OSCSynth::setAllADSRSustainLevel(double val) {
 
 	osci[0]->setADSRSustainLevel(val);
 	osci[1]->setADSRSustainLevel(val);
@@ -436,7 +436,7 @@ void RoMaSynthi::setAllADSRSustainLevel(double val) {
 	osci[6]->setADSRSustainLevel(val);
 }
 
-void RoMaSynthi::setAllADSRAttackTime(double val) {
+void OSCSynth::setAllADSRAttackTime(double val) {
 
 	osci[0]->setADSRAttackTime(val);
 	osci[1]->setADSRAttackTime(val);
@@ -447,7 +447,7 @@ void RoMaSynthi::setAllADSRAttackTime(double val) {
 	osci[6]->setADSRAttackTime(val);
 }
 
-void RoMaSynthi::setAllADSRReleaseTime(double val) {
+void OSCSynth::setAllADSRReleaseTime(double val) {
 
 	osci[0]->setADSRReleaseTime(val);
 	osci[1]->setADSRReleaseTime(val);
@@ -459,7 +459,7 @@ void RoMaSynthi::setAllADSRReleaseTime(double val) {
 }
 
 
-void RoMaSynthi::setAllADSRDecayTime(double val) {
+void OSCSynth::setAllADSRDecayTime(double val) {
 
 	osci[0]->setADSRDecayTime(val);
 	osci[1]->setADSRDecayTime(val);
@@ -473,7 +473,7 @@ void RoMaSynthi::setAllADSRDecayTime(double val) {
 
 
 //function that processes and scales the lfo-signal
-void RoMaSynthi::lfoHandler() {
+void OSCSynth::lfoHandler() {
 
 	//limits LFO Signal to certain step size
 	double lfo_step = 0.001;
@@ -509,7 +509,7 @@ void RoMaSynthi::lfoHandler() {
 }
 
 
-void RoMaSynthi::presets(int preset) {
+void OSCSynth::presets(int preset) {
 
 	switch(preset) {
 
