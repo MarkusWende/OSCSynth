@@ -10,6 +10,7 @@ set(CMAKE_BUILD_TYPE "Debug")
 set(THIRD_PARTY_DIR "external")
 set(MAIN_SOURCE_DIR "src")
 set(MAIN_INCLUDE_DIR "include")
+set(MAIN_LIB_DIR "lib")
 include_directories(${MAIN_INCLUDE_DIR})
 
 # RtMidi
@@ -26,7 +27,7 @@ include_directories(${LIBLO_DIR})
 set(JACKCPP_DIR ${THIRD_PARTY_DIR}/jackcpp)
 include_directories(${JACKCPP_DIR}/include)
 
-# jackcpp
+# jackaudio
 set(JACKAUDIO_DIR ${THIRD_PARTY_DIR}/jackaudio)
 include_directories(${JACKAUDIO_DIR})
 
@@ -58,7 +59,7 @@ add_library(
 )
 
 add_library(liblo SHARED IMPORTED)
-set_property(TARGET liblo PROPERTY IMPORTED_LOCATION "../lib/liblo.so")
+set_property(TARGET liblo PROPERTY IMPORTED_LOCATION "../${LIBLO_DIR}/build/liblo/liblo.so")
 
 # The 'oscsynth' executable
 add_executable(
@@ -66,4 +67,4 @@ add_executable(
     ${MAIN_SOURCE_DIR}/main.cpp
 )
 
-target_link_libraries(oscsynth app rtmidi jackcpp liblo)
+target_link_libraries(oscsynth app rtmidi jackcpp liblo jack)

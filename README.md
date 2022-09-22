@@ -25,7 +25,20 @@ A [Jack](http://www.jackaudio.org/) audio server is fundamental to run the
 synthesizer. Make sure you have a solid jack audio environment running. The 
 buffer size we use on the Raspberry Pi is ```256```
 and the sample rate is ```48kHz```. This might differ 
-from your system and you are free to find the right jack settings.
+from your system and you are free to find the right jack settings. Make sure,
+that you have the jackaudio library installed with,
+
+```javascript
+    sudo apt install libjack-jackd2-dev
+```
+
+or
+
+```javascript
+    sudo apt install libjack-dev
+```
+
+depending on your setup.
 
 ## Open Sound Control
 The OSCSynthesizer can be controlled via OSC. We use the app [TouchOSC](https://hexler.net/software/touchosc) by 
