@@ -20,7 +20,7 @@ include_directories(${RTMIDI_DIR})
 
 # liblo
 set(LIBLO_DIR ${THIRD_PARTY_DIR}/liblo)
-include_directories(${LIBLO_DIR}/build/liblo)
+include_directories(${LIBLO_DIR}/build)
 include_directories(${LIBLO_DIR})
 
 # jackcpp
@@ -59,7 +59,7 @@ add_library(
 )
 
 add_library(liblo SHARED IMPORTED)
-set_property(TARGET liblo PROPERTY IMPORTED_LOCATION "../${LIBLO_DIR}/build/liblo/liblo.so")
+set_property(TARGET liblo PROPERTY IMPORTED_LOCATION "../${LIBLO_DIR}/build/liblo.so")
 
 # The 'oscsynth' executable
 add_executable(

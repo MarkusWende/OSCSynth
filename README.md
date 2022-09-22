@@ -16,9 +16,9 @@ section carefully. The following flowchart gives an overview of the implementati
 ## Library
 The following external librarys are needed to compile the senthesizer onto your 
 system:  
-* [liblo](http://liblo.sourceforge.net/)
+* [liblo](https://github.com/radarsat1/liblo)
 * [jackcpp](https://github.com/x37v/jackcpp)
-* [rtmidi](https://www.music.mcgill.ca/~gary/rtmidi/index.html#download)
+* [rtmidi](https://github.com/thestk/rtmidi)
 
 ## Jack
 A [Jack](http://www.jackaudio.org/) audio server is fundamental to run the 
@@ -57,21 +57,23 @@ To install the software, make sure you fulfill the requirements and follow the
 next steps.
 
 * Download / Clone the Repository and get the submodules:
-
 ```javascript
     git clone git@github.com:MarkusWende/OSCSynth.git
+    cd OSCSynth
     git submodule update --init --recursive
 ```
 * (Optional) if you downloaded as a .zip file, unzip the archiv
 
-* Go into the folder:
-
+* Compile liblo:
 ```javascript
-    cd OSCSynth
+    cd external/liblo/build
+    cmake ../cmake/
+    make
 ```
-* Create a build directory and compile the source code:
 
+* Create a build directory in the root directory and compile the source code:
 ```javascript
+    cd ../../../
     mkdir build
     cd build
     cmake ..
