@@ -6,7 +6,7 @@
 #include "osc_synth.h"
 
 
-OSCSynthi::OSCSynth() : JackCpp::AudioIO("OSCSynth", 0,1) {
+OSCSynth::OSCSynth() : JackCpp::AudioIO("OSCSynth", 0,1) {
 	reserveInPorts(2);
 	reserveOutPorts(2);
 

@@ -7,7 +7,7 @@
 #define MIDIMAN_H
 
 #include "datatypes.h"
-#include <rtmidi/RtMidi.h>
+#include <RtMidi.h>
 #include <unistd.h>
 
 class MidiMan {

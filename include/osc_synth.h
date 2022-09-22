@@ -26,7 +26,7 @@ enum presetnumber{
 };
 
 
-class OSCSynthi: public JackCpp::AudioIO {
+class OSCSynth: public JackCpp::AudioIO {
 
 private:
 

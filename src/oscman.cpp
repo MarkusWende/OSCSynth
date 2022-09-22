@@ -14,7 +14,6 @@ void error(int num, const char *msg, const char *path) {
  * initialize and start osc server thread
  */
 OscMan::OscMan(int p) {
-
     // osc server thread object
 	lo_server_thread st = lo_server_thread_new("50000", error);
     // Add the callback handler to the server!
@@ -28,7 +27,7 @@ OscMan::OscMan(int p) {
  * process osc messages
  */
 int OscMan::double_callback(const char *path, const char *types, lo_arg ** argv,
-                            int argc, void *data, void *user_data ) {
+                            int argc, lo_message data, void *user_data ) {
     // Converts between types using a combination of implicit and user-defined conversions
     OscMan* statCast = static_cast<OscMan*>(user_data);
 
@@ -59,6 +58,8 @@ int OscMan::double_callback(const char *path, const char *types, lo_arg ** argv,
     statCast->paths.push_back(path);
     statCast->types.push_back(types);  
     //statCast->messages.push_back(argv[0]->f);
+
+    return 1;
 }
 
 /* get last double value from double value vector

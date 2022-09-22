@@ -3,6 +3,8 @@ OSCSynth
 OSCSynth.exe
 obj/
 obj/*
+build
+build/*
 
 # Tempfiles
 *.swp
