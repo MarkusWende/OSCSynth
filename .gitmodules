@@ -1,0 +1,9 @@
+[submodule "external/jackcpp"]
+	path = external/jackcpp
+	url = https://github.com/x37v/jackcpp.git
+[submodule "external/rtmidi"]
+	path = external/rtmidi
+	url = https://github.com/thestk/rtmidi.git
+[submodule "external/liblo"]
+	path = external/liblo
+	url = https://github.com/radarsat1/liblo.git
