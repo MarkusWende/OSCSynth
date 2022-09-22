@@ -30,6 +30,10 @@ include_directories(${LIBLO_DIR})
 set(JACKCPP_DIR ${THIRD_PARTY_DIR}/jackcpp)
 include_directories(${JACKCPP_DIR}/include)
 
+# jackcpp
+set(JACKAUDIO_DIR ${THIRD_PARTY_DIR}/jackaudio)
+include_directories(${JACKAUDIO_DIR})
+
 add_library(
     app
     ${MAIN_SOURCE_DIR}/adsr.cpp
@@ -69,4 +73,4 @@ add_executable(
     ${MAIN_SOURCE_DIR}/main.cpp
 )
 
-target_link_libraries(oscsynth app rtmidi jackcpp liblo jack)
+target_link_libraries(oscsynth app rtmidi jackcpp liblo)
