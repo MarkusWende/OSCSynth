@@ -12,11 +12,7 @@ set(MAIN_SOURCE_DIR "src")
 set(MAIN_INCLUDE_DIR "include")
 include_directories(${MAIN_INCLUDE_DIR})
 
-#set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules")
-#set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}")
-
 # RtMidi
-#add_subdirectory(${THIRD_PARTY_DIR}/rtmidi ${PROJECT_BINARY_DIR}/rtmidi.dir)
 set(RTMIDI_DIR ${THIRD_PARTY_DIR}/rtmidi)
 add_subdirectory(${RTMIDI_DIR} ${PROJECT_BINARY_DIR}/rtmidi.dir)
 include_directories(${RTMIDI_DIR})
@@ -61,11 +57,8 @@ add_library(
     ${JACKCPP_DIR}/src/jackmidiport.cpp
 )
 
-#add_library(jackcppa STATIC IMPORTED)
-#set_property(TARGET jackcppa PROPERTY IMPORTED_LOCATION "../${JACKCPP_DIR}/libjackcpp.a")
-
 add_library(liblo SHARED IMPORTED)
-set_property(TARGET liblo PROPERTY IMPORTED_LOCATION "../${LIBLO_DIR}/build/liblo/liblo.so")
+set_property(TARGET liblo PROPERTY IMPORTED_LOCATION "../lib/liblo.so")
 
 # The 'oscsynth' executable
 add_executable(

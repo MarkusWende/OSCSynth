@@ -5,6 +5,8 @@ obj/
 obj/*
 build
 build/*
+external/liblo/build/*
+lib/*
 
 # Tempfiles
 *.swp

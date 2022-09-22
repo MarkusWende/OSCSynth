@@ -43,21 +43,25 @@ the flowchart, or you can connect in jack a software midi keyboard like the
 To install the software, make sure you fulfill the requirements and follow the 
 next steps.
 
-* Download / Clone the Repository:
+* Download / Clone the Repository and get the submodules:
 
 ```javascript
-    git clone git@gitlab.tubit.tu-berlin.de:markus.wende/OSC_Synthesizer_One.git
+    git clone git@github.com:MarkusWende/OSCSynth.git
+    git submodule update --init --recursive
 ```
 * (Optional) if you downloaded as a .zip file, unzip the archiv
 
 * Go into the folder:
 
 ```javascript
-    cd OSC_Synthesizer_One*
+    cd OSCSynth
 ```
-* Compile the source code:
+* Create a build directory and compile the source code:
 
 ```javascript
+    mkdir build
+    cd build
+    cmake ..
     make
 ```
 
@@ -66,20 +70,20 @@ If you want to start the synthesizer, make sure you are in the folder you
 compiled it. If you want global access to the synthesizer you have to add the 
 program to your PATH variable. In the terminal type: 
 ```javascript
-    export PATH=$PATH:/path/to/my/OSCSynth
+    export PATH=$PATH:/path/to/my/OSCSynth/build
 ```
 And make sure you changed the path to the right one. 
 
 Now you can run the synthesizer from the command line by:
 
 ```javascript
-    OSCSynth
+    oscsynth
 ```
 
 If you have exported the program to your PATH, or by:
 
 ```javascript
-    ./OSCSynth
+    ./oscsynth
 ```
 
 If you are still in the compile directory. If everything works fine you should 
