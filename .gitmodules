@@ -8,5 +8,5 @@
 	path = external/liblo
 	url = https://github.com/radarsat1/liblo.git
 [submodule "external/jackaudio/jack"]
-	path = build/external/jackaudio/jack
+	path = external/jackaudio/jack
 	url = https://github.com/jackaudio/headers.git
