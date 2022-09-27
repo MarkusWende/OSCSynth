@@ -67,7 +67,7 @@ Oscicontainer::Oscicontainer(int type, double f) {
  */
 double Oscicontainer::getNextSample() {
   // initialize return value
-  double thisVal;
+  double thisVal = 0.0;
 
   // lfo signal
   if (this->isLFO==true) {

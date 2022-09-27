@@ -39,8 +39,9 @@ int main(int argc, char *argv[]) {
 		synth->oscHandler();
 		// calls the lfo handler to calculate the filter coefficients
 		synth->lfoHandler();
-		
-		usleep(5);
+
+		synth->process();
+		//usleep(5);
     }
 
     synth->disconnectOutPort(0);		// Disconnecting ports

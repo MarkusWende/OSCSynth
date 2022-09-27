@@ -15,6 +15,8 @@ OSCSynth::OSCSynth() : JackCpp::AudioIO("OSCSynth", 0,1) {
 	// delivers the buffer size
 	nframes = getBufferSize();
 
+	ring_buffer_out_ = new JackCpp::RingBuffer<float>(nframes*8, true);
+
 	std::cout << "fs: " << fs << " Hz";
 	std::cout << " || buffer size: " << nframes << " samples" << endl;
 
@@ -65,47 +67,24 @@ OSCSynth::OSCSynth() : JackCpp::AudioIO("OSCSynth", 0,1) {
 
 }
 
+OSCSynth::~OSCSynth()
+{
+	ring_buffer_out_->~RingBuffer();
+}
 
 
-    /// Audio Callback Function:
-    /// - the output buffers are filled here
-int OSCSynth::audioCallback(jack_nframes_t nframes,
-                              // A vector of pointers to each input port.
-                              audioBufVector inBufs,
-                              // A vector of pointers to each output port.
-                              audioBufVector outBufs) {
+/// Audio Callback Function:
+/// - the output buffers are filled here
+int
+OSCSynth::audioCallback(jack_nframes_t nframes,
+						// A vector of pointers to each input port.
+						audioBufVector inBufs,
+						// A vector of pointers to each output port.
+						audioBufVector outBufs)
+{
+	// Read the ring buffer and write to the output buffer
+	ring_buffer_out_->read(outBufs[0], nframes);
 
-        /// LOOP over all output buffers
-    for(unsigned int i = 0; i < 1; i++) {
-
-    	for(int frameCNT = 0; frameCNT  < nframes; frameCNT++) {
-            
-               
-                
-                outBufs[0][frameCNT] = (osci[0]->getNextSample() +
-										osci[1]->getNextSample() + 
-										osci[2]->getNextSample() +
-										osci[3]->getNextSample() +
-										osci[4]->getNextSample() +
-										osci[5]->getNextSample() +
-										osci[6]->getNextSample()) / 7;
-
-
-                if(filterStatus) {
-                	//hand over to filter
-                	outBufs[0][frameCNT] = filter->process(outBufs[0][frameCNT]); 
-                }
-                
-                //hand over to distortion
-                outBufs[0][frameCNT] = distortion->process(outBufs[0][frameCNT]); 
-
-				
-				// rotate lfo oscillator to next step
-				lfo->getNextSample();
-		}
-    }
-
-        
  	///return 0 on success        
     return 0;
 }
@@ -247,7 +226,7 @@ void OSCSynth::oscHandler() {
 
   	// determine the osc message type and use the according getter method 
   	// (intiger = i, float= f, string =s)
-	string type = osc->getLastType();
+	auto type = osc->getLastType();
 	
 	if (type != "empty")
 	{
@@ -257,7 +236,7 @@ void OSCSynth::oscHandler() {
 
 	  	else if  (type== "s") val =  osc->getLastChar();
 
-	  	string path = osc->getLastPath();
+	  	auto path = osc->getLastPath();
 
 		typeOld = type;
 		pathOld = path;
@@ -676,4 +655,39 @@ void OSCSynth::presets(int preset) {
 		break;
 
 	}
+}
+
+void
+OSCSynth::process()
+{
+	for(unsigned int i = 0; i < 1; i++)
+	{
+		size_t dataSize = ring_buffer_out_->getWriteSpace();
+		float data[dataSize];
+    	for(int frameCNT = 0; frameCNT  < dataSize; frameCNT++)
+		{
+			float sample = 0.0f;
+
+			sample =   (osci[0]->getNextSample() +
+						osci[1]->getNextSample() + 
+						osci[2]->getNextSample() +
+						osci[3]->getNextSample() +
+						osci[4]->getNextSample() +
+						osci[5]->getNextSample() +
+						osci[6]->getNextSample()) / 7.0;
+		
+
+			if(filterStatus)
+				sample = filter->process(sample);
+		
+			// Commented out, because it makes to much artifacts
+			//sample = distortion->process(sample); 
+
+			// rotate lfo oscillator to next step
+			lfo->getNextSample();
+
+			data[frameCNT] = sample;
+		}
+		ring_buffer_out_->write(data, dataSize);
+    }
 }

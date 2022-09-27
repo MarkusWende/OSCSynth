@@ -21,8 +21,6 @@ enum presetnumber{
     nice_pulse=		3,
     in_the_night=	4,
     high_hat=		5,
-
-
 };
 
 
@@ -59,6 +57,9 @@ private:
 	string pathOld;
 	double lfo_oldValue=0;
 
+	// Ring buffer output
+	JackCpp::RingBuffer<float>* ring_buffer_out_;
+
 public:
 
     /// Declaration of Audio Callback Function:
@@ -70,6 +71,7 @@ public:
 
     /// Constructor
 	OSCSynth();
+	~OSCSynth();
 
 	// Setters
 	
@@ -87,5 +89,6 @@ public:
 	void setAllADSRAttackTime(double val);
 	void setAllADSRReleaseTime(double val);
 	void setAllADSRDecayTime(double val);
+	void process();
 
 };
