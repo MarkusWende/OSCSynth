@@ -25,10 +25,10 @@ MidiMan::MidiMan() {
 	midiin = new RtMidiIn(api,clientName,queueSizeLimit);	
 
     //
-    unsigned int nPorts = midiin->getPortCount();
+    //unsigned int nPorts = midiin->getPortCount();
 
     midiin->openPort( 0 );
-    //    // Don't ignore sysex, timing, or active sensing messages.
+    // Don't ignore sysex, timing, or active sensing messages.
     midiin->ignoreTypes( false, false, false );
 	isVerbose = false;
 

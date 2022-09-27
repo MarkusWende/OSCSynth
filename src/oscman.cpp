@@ -5,7 +5,9 @@ using namespace std;
 
 /* Error handler
  */
-void error(int num, const char *msg, const char *path) {
+void
+error(int num, const char *msg, const char *path)
+{
     printf("liblo server error %d in path %s: %s\n", num, path, msg);
     fflush(stdout);
 }
@@ -13,9 +15,21 @@ void error(int num, const char *msg, const char *path) {
 /* Constructor
  * initialize and start osc server thread
  */
-OscMan::OscMan(int p) {
+OscMan::OscMan()
+{
     // osc server thread object
 	lo_server_thread st = lo_server_thread_new("50000", error);
+    // Add the callback handler to the server!
+	lo_server_thread_add_method(st, NULL, NULL, double_callback, this);
+	// start server thread
+    lo_server_thread_start(st);
+    std::cout << "Started OSC Server!" << std::endl;
+}
+
+OscMan::OscMan(const char* port)
+{
+    // osc server thread object
+	lo_server_thread st = lo_server_thread_new(port, error);
     // Add the callback handler to the server!
 	lo_server_thread_add_method(st, NULL, NULL, double_callback, this);
 	// start server thread
@@ -26,10 +40,19 @@ OscMan::OscMan(int p) {
 /* Callback Handler
  * process osc messages
  */
-int OscMan::double_callback(const char *path, const char *types, lo_arg ** argv,
-                            int argc, lo_message data, void *user_data ) {
+int
+OscMan::double_callback(    const char *path,
+                            const char *types,
+                            lo_arg ** argv,
+                            int argc,
+                            lo_message data,
+                            void *user_data )
+{
+    (void)argc;
+    (void)data;
+    
     // Converts between types using a combination of implicit and user-defined conversions
-    OscMan* statCast = static_cast<OscMan*>(user_data);
+    auto statCast = static_cast<OscMan*>(user_data);
 
     // message double (float)
     if (std::string(types)=="f") {

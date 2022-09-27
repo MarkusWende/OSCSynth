@@ -11,7 +11,6 @@ ADSR::ADSR(void)
     Reset();
 }
 
-inline
 float
 ADSR::Process()
 {

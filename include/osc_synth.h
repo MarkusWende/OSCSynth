@@ -44,7 +44,7 @@ private:
 	// variables for midi handling
 	double t_tracking; //time tracker
 	int counter; //counter for the number of used oscillators
-	int maxAnzahl_Osci;// max number of availible oscillators
+	size_t maxAnzahl_Osci;// max number of availible oscillators
 
 	// vecors for midi handling
 	vector<int> Noten;

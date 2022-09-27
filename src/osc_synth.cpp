@@ -5,6 +5,7 @@
 
 #include "osc_synth.h"
 
+//#define DEBUG
 
 OSCSynth::OSCSynth() : JackCpp::AudioIO("OSCSynth", 0,1) {
 	reserveInPorts(2);
@@ -32,7 +33,7 @@ OSCSynth::OSCSynth() : JackCpp::AudioIO("OSCSynth", 0,1) {
 	osci[6] = new Oscicontainer(fs);
 
 	// osc manager is created
-	osc = new OscMan(50000);
+	osc = new OscMan("50000");
 	// midi manager is created
 	midi = new MidiMan();
 
@@ -82,6 +83,8 @@ OSCSynth::audioCallback(jack_nframes_t nframes,
 						// A vector of pointers to each output port.
 						audioBufVector outBufs)
 {
+	// Do nothing with input buffer
+	(void)inBufs;
 	// Read the ring buffer and write to the output buffer
 	ring_buffer_out_->read(outBufs[0], nframes);
 
@@ -92,9 +95,8 @@ OSCSynth::audioCallback(jack_nframes_t nframes,
 
 // The Midi Handler receives messages from the midi manager
 // all note on and note off handling happens here
-void OSCSynth::midiHandler() {
-
-
+void OSCSynth::midiHandler()
+{
       	/// process midi messages
         
         // In RT Midi defined values for note-on and note-off are being sent:
@@ -104,30 +106,33 @@ void OSCSynth::midiHandler() {
         
 		midiMessage info = midi->get_rtmidi();
 	
-		int val1 = info.byte1;
-		int val2 = info.byte2;
-		double val3 = info.byte3;
-		double delta_time = info.stamp; // get time information
+		auto val1 = info.byte1;
+		auto val2 = info.byte2;
+		auto val3 = info.byte3;
+		auto delta_time = info.stamp; // get time information
 
       	//accumulate time
 		t_tracking = t_tracking + delta_time; 
        
 
-		int osci_nummer = 0;
-		int position = 0;
+		size_t osci_nummer = 0;
+		size_t position = 0;
 		
 		///////////////////
 		// note-on procedure
 		///////////////////
-        if(val1==144) {
+        if(val1==144)
+		{
 
             //if all oscillators are being used, kill oldest
             if(counter==7) {
-				int min = timetracker[0];
-				int index = 0;
+				auto min = timetracker[0];
+				size_t index = 0;
 				//find oldest value, i.e. smallest time value
-				for(int i=1; i<timetracker.size(); i++) {
-					if(timetracker[i]<min) {
+				for(size_t i = 1; i < timetracker.size(); i++)
+				{
+					if(timetracker[i] < min)
+					{
 						min = timetracker[i];
 						index = i;
 					}
@@ -150,9 +155,8 @@ void OSCSynth::midiHandler() {
 				counter--;
 			}
 
-
 			//formula to calculate the frequency from midi note value
-			double f0 = std::pow(double (2), (val2-double(69))/double(12))*440;
+			auto f0 = std::pow(2.0, ((double)val2-69.0) / 12.0) * 440.0;
 				  
 			//find a free oscillator
 			osci_nummer = freeOsci.back();
@@ -185,14 +189,14 @@ void OSCSynth::midiHandler() {
         ///////////////////
 		// note-off procedure (val1 = 128)
 		///////////////////    
-        
-        if(val1==128 ) {
+        if(val1==128 )
+		{
 
         	//find the oscillator that plays the frequency refering to the note-off order
             position = find(Noten.begin(), Noten.end(), val2) - Noten.begin();
             
             
-            if(position<maxAnzahl_Osci) {	// security measure to prevent stack dump
+            if(position < maxAnzahl_Osci) {	// security measure to prevent stack dump
             	// enter into release mode
               	osci[position]->setReleaseNoteState(2);
               	osci[position]->setADSRState(4);
@@ -211,11 +215,10 @@ void OSCSynth::midiHandler() {
  
         }
             
-         /*
-         //for debugging
-        if (val1>=0) {
-         std::cout << "Frei: " << freeOsci.size() << " Zeit: " << t_tracking << "Counter: " << counter << endl;
-       }*/
+#ifdef DEBUG
+	if (val1>=0)
+		std::cout << "Frei: " << freeOsci.size() << " Zeit: " << t_tracking << "Counter: " << counter << endl;
+#endif // DEBUG
 }
 
 
@@ -660,11 +663,11 @@ void OSCSynth::presets(int preset) {
 void
 OSCSynth::process()
 {
-	for(unsigned int i = 0; i < 1; i++)
+	for(size_t i = 0; i < 1; i++)
 	{
 		size_t dataSize = ring_buffer_out_->getWriteSpace();
-		float data[dataSize];
-    	for(int frameCNT = 0; frameCNT  < dataSize; frameCNT++)
+		std::vector<float> data;
+    	for(size_t frameCNT = 0; frameCNT  < dataSize; frameCNT++)
 		{
 			float sample = 0.0f;
 
@@ -686,8 +689,8 @@ OSCSynth::process()
 			// rotate lfo oscillator to next step
 			lfo->getNextSample();
 
-			data[frameCNT] = sample;
+			data.push_back(sample);
 		}
-		ring_buffer_out_->write(data, dataSize);
+		ring_buffer_out_->write(data.data(), dataSize);
     }
 }

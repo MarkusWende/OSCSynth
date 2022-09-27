@@ -12,7 +12,10 @@ void exitSigHandler(int s) {
 
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
+	(void)argc;
+	(void)argv;
     
     // create synthesizer object/client
     OSCSynth *synth = new OSCSynth();

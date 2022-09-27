@@ -84,7 +84,7 @@ double Oscicontainer::getNextSample() {
     thisVal = thisVal + osciNoise->getNextSample();
     // if adsr is activated, multiply envelope and signal
     if (this->ADSRStatus) {
-      thisVal = thisVal * envelope->process();
+      thisVal = thisVal * envelope->Process();
     } else {
       thisVal = thisVal * relNote->process();
     }
@@ -192,7 +192,7 @@ void Oscicontainer::setReleaseNoteState(int status) {
  * release = 4
  */
 void Oscicontainer::setADSRState(int status) {
-  envelope->gate(status);
+  envelope->SetState(status);
 }
 
 /* set adsr status on or off
@@ -231,26 +231,26 @@ double Oscicontainer::getCurrentAmpl() {
  * range: 1 to 99
  */
 void Oscicontainer::setADSRAttackTime(float t) {
-  envelope->setAttackTime(t);
+  envelope->SetAttack(t);
 }
 
 /* set adsr decay_time
  * range: 1 to 99
  */
 void Oscicontainer::setADSRDecayTime(float t) {
-  envelope->setDecayTime(t);
+  envelope->SetDecay(t);
 }
 
 /* set adsr sustain_level
  * range: 1 to 99
  */
 void Oscicontainer::setADSRSustainLevel(float level) {
-  envelope->setSustainLevel(level);
+  envelope->SetSustain(level);
 }
 
 /* set adsr release_time
  * range: 1 to 99
  */
 void Oscicontainer::setADSRReleaseTime(float t) {
-  envelope->setReleaseTime(t);
+  envelope->SetRelease(t);
 }

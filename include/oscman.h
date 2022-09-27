@@ -28,7 +28,9 @@ private:
 
 public:
     // Constructor
-    OscMan(int p);
+    OscMan();
+    OscMan(const char* port);
+    ~OscMan();
 
     // Getters
     double getLastDouble();

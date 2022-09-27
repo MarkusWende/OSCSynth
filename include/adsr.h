@@ -43,7 +43,7 @@ public:
      *              release_time_
      * @return Return the output as a float.
      */
-	inline float Process(void);
+	float Process(void);
 
     /**
      * @brief Reset or init the ADSR.
