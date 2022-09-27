@@ -1,74 +1,71 @@
+/**
+ * @file adsr.cpp
+ * @author Markus Wende and Robert Pelzer
+ * @brief ADSR class implementation.
+ */
+
 #include "adsr.h"
 
-/* constructor
- */
-ADSR::ADSR(void) {
-    reset();
+ADSR::ADSR(void)
+{
+    Reset();
 }
 
-/* set the state of the adsr
- */
-void ADSR::gate(int gate) {
-    if (gate == 0)
-        state = note_off;
-    else if (gate == 1)
-        state = attack;
-    else if (gate == 2)
-        state = decay;
-    else if (gate == 3)
-        state = sustain;
-    else if (gate == 4)
-        state = release;
+inline
+float
+ADSR::Process()
+{
+    if (state_ == noteState::ATTACK)
+    {
+        if (output_ == 0.0)
+            output_ = 0.001;
+        if (old_state_ >= 2)
+            output_ = 0.001;
+        // multiplicator goes from 0.04 to 0.00002
+        // with release_time from 1 to 99
+        output_ = output_ + output_ * (1 - (exp(-log10((1.0 + 10) / 10 ) / attack_time_) + 0.0004));
+        old_state_ = state_;
+        if (output_ >= 0.99) {
+            output_ = 1.0;
+            state_ = noteState::DECAY;
+        }
+    } else if (state_ == noteState::DECAY) {
+        // multiplicator goes from 0.99924 to 0.999992
+        // with release_time from 1 to 99
+        output_ = output_ * (0.99 + (exp(-log10((2.0 + 10) / 10 ) / decay_time_) / 100));
+        old_state_ = state_;
+        if (output_ <= sustain_level_ / 100) {
+            state_ = noteState::SUSTAIN;
+        }
+    } else if (state_ == noteState::SUSTAIN) {
+        // sustain goes from 1 to 99
+        output_ = sustain_level_ / 100;
+    } else if (state_ == noteState::RELEASE) {
+        // multiplicator goes from 0.99924 to 0.999992
+        // with release_time from 1 to 99
+        output_ = output_ * (0.99 + (exp(-log10((2.0 + 10) / 10 ) / release_time_) / 100));
+        old_state_ = state_;
+        if (output_ <= 0.001) {
+            output_ = 0.0;
+            state_ = noteState::NOTE_OFF;
+        }
+      
+    } else {
+        output_ = 0.0;
+        state_ = noteState::NOTE_OFF;
+    }
+
+    return output_;
 }
 
-/* get the current state of the adsr
- */
-int ADSR::getState() {
-    return this->state;
-}
+void
+ADSR::Reset()
+{
+    state_ = noteState::NOTE_OFF;
+    output_ = 0.0;
 
-/* reset the adsr with preset values for the envelope
- */
-void ADSR::reset() {
-    state = note_off;
-    output = 0.0;
-
-    attack_time = 1.0;
-    decay_time = 1.0;
-    sustain_level = 99;
-    release_time = 1.0;
-}
-
-/* returns the output
- */
-float ADSR::getOutput() {
-    return output;
-}
-
-/* set the attack_time value
- * with an input range from 1 to 99
- */
-void ADSR::setAttackTime(float t) {
-    attack_time = t;
-}
-
-/* set the decay_time value
- * with an input range from 1 to 99
- */
-void ADSR::setDecayTime(float t) {
-    decay_time = t;
-}
-
-/* set the release_time value
- * with an input range from 1 to 99
- */
-void ADSR::setReleaseTime(float t) {
-    release_time = t;
-}
-
-/* set the sustain_level value
- * with an input range from 1 to 99
- */
-void ADSR::setSustainLevel(float level) {
-    sustain_level = level;
+    attack_time_ = 1.0;
+    decay_time_ = 1.0;
+    sustain_level_ = 99;
+    release_time_ = 1.0;
 }
