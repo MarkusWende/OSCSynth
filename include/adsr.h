@@ -53,7 +53,7 @@ public:
      */
     void Reset();
 
-    // GETTERS
+    // GETTER
     /**
      * @brief Set the attack time.
      * @return Return the output as a float.
@@ -66,7 +66,7 @@ public:
      */
     int     GetState()      { return state_; };
 
-    // SETTERS
+    // SETTER
     /**
      * @brief Set the attack time.
      * @param t attack time, as a float, range from 1.0f to 99.0f.

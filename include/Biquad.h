@@ -22,6 +22,20 @@
 
 //	The Code was edited in certain areas by Robert Pelzer and Markus Wende
 // 	Where the Code was edited, comments were created
+//  The biquad filter class is the implementation of a digital biquad filter, 
+//  which is a second-order recursive linear filter, containing two poles and two zeros. 
+//  The source code was taken from the following website: https://www.earlevel.com/main/2012/11/26/biquad-c-source-code/
+//  Some changes were made to the filter to make it fit our needs. 
+//  The Biquad has seven different selectable filters (lowpass, high pass, band pass, notch, peak, low shelf, high shelf). 
+//  For each filter a set of formulas is implemented which calculate the filter coefficients. 
+//  The advantage of using this biquad filter is, that it is a pretty flexible solution, 
+//  however on the downside of is the fact that every little parameter change of the filter leads to a re-calculation of the coefficients. 
+//  Fortunately, this doesn´t create any processing problems.
+//  The lowpass, high pass, band pass and the peak filter respond to a Q value which determines bandwidth for the band pass filter, 
+//  a steepness for low and high pass filters and the width of the peak filter. The low shelf, high shelf and peak filter don´t respond to Q value, but to a peak Gain. 
+//  A high gain additionally led to distortion, which in some cases was very nice sounding. 
+//  However, we undid this rise of gain to be able to implement a general distortion class. 
+//  This had the effect that the peak gain didn´t increase the signals volume, but in praxis has a similar effect as Q for the other filters.
 
 #pragma once
 
@@ -42,19 +56,25 @@ enum filterType
 class Biquad
 {
 public:
-    // CONSTRUCTEUR & DESCTRUCTOR
-    Biquad();
+    // CONSTRUCTEUR
     /**
-     * @brief Constructor with parameters
+     * @brief Standard Constructor.
+     */
+    Biquad();
+
+    /**
+     * @brief Constructor with parameters.
      * @param type Type of the filter, like filterType::LOWPASS, filterType::PEAK etc.
-     * @param fc Type of the filter, like filterType::LOWPASS, filterType::PEAK etc.
-     * @param q Type of the filter, like filterType::LOWPASS, filterType::PEAK etc.
-     * @param peakGain Type of the filter, like filterType::LOWPASS, filterType::PEAK etc.
+     * @param fc Filter cut off frequency as a double.
+     * @param q The Q value (quality factor) as a double.
+     * @param peakGain Gain of the filter, for filterType::PEAK, filterType::LOWSHELF and filterType::HIGHSHELF.
      */
     Biquad(int type, double fc, double q, double peakGain);
+
+    // DESCTRUCTOR
     ~Biquad();
 
-    // Setter
+    // SETTER
     /**
      * @brief Set the filter type. See \ref filterType
      * @param type Type of the filter, like filterType::LOWPASS, filterType::PEAK etc.
@@ -63,50 +83,42 @@ public:
     void SetType(filterType type);
 
     /**
-     * @brief Set the filter quality factor (Q) of the filter
-     * @param q The Q value (quality factor) as a double
+     * @brief Set the filter quality factor (Q) of the filter.
+     * @param q The Q value (quality factor) as a double.
      * @return Return void.
      */
     void SetQ(double q);
 
     /**
-     * @brief Set the filter quality factor (Q) of the filter
-     * @param q The Q value (quality factor) as a double
+     * @brief Set the filter cut off frequency of the filter.
+     * @param fc The Q value (quality factor) as a double
      * @return Return void.
      */
     void SetFc(double fc);
 
     /**
-     * @brief Set the filter quality factor (Q) of the filter
-     * @param q The Q value (quality factor) as a double
+     * @brief Set peak gain.
+     * @param peakGain Gain of the filter, for filterType::PEAK, filterType::LOWSHELF and filterType::HIGHSHELF.
      * @return Return void.
      */
     void SetPeakGain(double peakGain);
 
     /**
-     * @brief Set the filter quality factor (Q) of the filter
-     * @param q The Q value (quality factor) as a double
+     * @brief Set gain ruduction on / off.
+     * @param status Gain reduction status as a bool. True = on and False = off.
      * @return Return void.
      */
-    void SetGainReduce(int on);
+    void SetGainReduce(bool status);
 
     /**
-     * @brief Set the filter quality factor (Q) of the filter
-     * @param q The Q value (quality factor) as a double
-     * @return Return void.
+     * @brief Process a value and return the filtered value.
+     * @param in Input value as a double.
+     * @return Return Filtered value as a double.
      */
-    void SetBiquad(double peakGain);
+    double Process(double in);
 
     /**
-     * @brief Set the filter quality factor (Q) of the filter
-     * @param q The Q value (quality factor) as a double
-     * @return Return void.
-     */
-    float Process(float in);
-
-    /**
-     * @brief Set the filter quality factor (Q) of the filter
-     * @param q The Q value (quality factor) as a double
+     * @brief Print the filter type to the screen/file.
      * @return Return void.
      */
     void Status();
@@ -120,19 +132,19 @@ private:
     void calc_biquad();
 
     int     type_;                      /**< Type of the filter. */
-    double  a0_, a1_, a2_, b1_, b2_;    /**< The filter is a lowpass. */
-    double  fc_, q_, peak_gain_;        /**< The filter is a lowpass. */
-    double  z1_, z2_;                   /**< The filter is a lowpass. */
-    bool    gain_reduce_;               /**< The filter is a lowpass. */
+    double  a0_, a1_, a2_, b1_, b2_;    /**< Filter coefficients. */
+    double  fc_, q_, peak_gain_;        /**< Cut off frequency; q value; peak gain. */
+    double  z1_, z2_;                   /**< Z delays. */
+    bool    gain_reduce_;               /**< If a gain reduction is applied or not. */
 };
 
 /**
- * @brief Reset or init the ADSR.
- * @return Return void.
+ * @brief Inline function to process a value.
+ * @return Return double.
  */
-inline float Biquad::Process(float in)
+inline double Biquad::Process(double in)
 {
-    double out = in * a0_ + z1_;
+    auto out = in * a0_ + z1_;
     z1_ = in * a1_ + z2_ - b1_ * out;
     z2_ = in * a2_ - b2_ * out;
     
