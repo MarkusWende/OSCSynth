@@ -26,6 +26,8 @@ private:
     static int double_callback(const char *path, const char *types, lo_arg ** argv,
                             int argc, lo_message data, void *user_data);
 
+    void init(const char* port);
+
 public:
     // Constructor
     OscMan();

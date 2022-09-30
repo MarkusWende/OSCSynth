@@ -1,21 +1,26 @@
 #include <signal.h>
+#include <aixlog.hpp>
+
 #include "osc_synth.h"
 
 // while exit condition
 bool done = false;
 
 // Signal Handler function
-void exitSigHandler(int s) {
-	printf("Caught signal %d ... Bye!\n",s);
-	// set while exit condition true
+void exitSigHandler(int s)
+{
+	LOG(INFO) << "Caught signal " << s << "... Bye!\n";
 	done = true; 
-
 }
 
 int main(int argc, char *argv[])
 {
 	(void)argc;
 	(void)argv;
+
+	auto sink_cout = std::make_shared<AixLog::SinkCout>(AixLog::Severity::trace);
+    auto sink_file = std::make_shared<AixLog::SinkFile>(AixLog::Severity::trace, "date.log");
+    AixLog::Log::init({sink_cout, sink_file});
     
     // create synthesizer object/client
     OSCSynth *synth = new OSCSynth();

@@ -3,16 +3,18 @@
 /* Constructor
  * Oscillator container which stores the different signal types
  */
-Oscicontainer::Oscicontainer(uint32_t fs) {
+Oscicontainer::Oscicontainer(uint32_t fs)
+{
+  fs_ = fs;
   // initialize signals with preset values
- 	osciSine = new Sinusoid(440,0.0,0,fs);
-	osciSaw = new Sawtoothwave(440,0.0,0,fs);
-	osciSquare = new Squarewave(440,0.0,0,fs);
+ 	osciSine = new Sinusoid(440,0.0,0,fs_);
+	osciSaw = new Sawtoothwave(440,0.0,0,fs_);
+	osciSquare = new Squarewave(440,0.0,0,fs_);
 	osciNoise = new Noise(0.0);
 
   // set lfo status to false -> this is the signal container
   // for the audible signals not lfo
-	this->isLFO = false;
+	isLFO = false;
 
 	// create release Note Object, for artefact elimination
 	relNote = new releaseNote();
@@ -33,10 +35,12 @@ Oscicontainer::Oscicontainer(uint32_t fs) {
  * Type 0 (and any other non-defined): Sinus, 
  * Type 1: Saw, Type 2: Square
  */
-Oscicontainer::Oscicontainer(int type, double f) {
+Oscicontainer::Oscicontainer(uint32_t fs, int type, double f)
+{
+  fs_ = fs;
   // initialize lfo signals with preset values
-  lfoSaw= new Sawtoothwave(f,1,0,48000);
-  lfoSquare= new Squarewave(f,1,0,48000);
+  lfoSaw = new Sawtoothwave(f,1,0,48000);
+  lfoSquare = new Squarewave(f,1,0,48000);
   lfoSin = new Sinusoid(f,1,0,48000);
   
   // presets for different lfo signals
@@ -57,7 +61,7 @@ Oscicontainer::Oscicontainer(int type, double f) {
 
   // set isLFO true, because this container is the lfo signal
   // container
-  this->isLFO = true;
+  isLFO = true;
 }
 
 
@@ -70,9 +74,9 @@ double Oscicontainer::getNextSample() {
   double thisVal = 0.0;
 
   // lfo signal
-  if (this->isLFO==true) {
-    if(this->type ==1) thisVal= lfoSaw->getNextSample();
-    else if (this->type ==2) thisVal = lfoSquare->getNextSample();
+  if (isLFO==true) {
+    if(type ==1) thisVal= lfoSaw->getNextSample();
+    else if (type ==2) thisVal = lfoSquare->getNextSample();
     else thisVal= lfoSin->getNextSample();
   
   // audible signal
@@ -83,7 +87,7 @@ double Oscicontainer::getNextSample() {
     thisVal = thisVal + osciSquare->getNextSample();
     thisVal = thisVal + osciNoise->getNextSample();
     // if adsr is activated, multiply envelope and signal
-    if (this->ADSRStatus) {
+    if (ADSRStatus) {
       thisVal = thisVal * envelope->Process();
     } else {
       thisVal = thisVal * relNote->process();
@@ -99,12 +103,12 @@ double Oscicontainer::getNextSample() {
  */
 void Oscicontainer::amplitude(double a) {
   // lfo signal container
-  if (this->isLFO==true) {
-      if(this->type ==1) {
+  if (isLFO==true) {
+      if(type ==1) {
         lfoSaw->amplitude(1);
         lfoSquare->amplitude(0);
       lfoSin->amplitude(0);
-    } else if (this->type ==2) {
+    } else if (type ==2) {
       lfoSaw->amplitude(0);
       lfoSquare->amplitude(1);
       lfoSin->amplitude(0);
@@ -129,7 +133,7 @@ void Oscicontainer::amplitude(double a) {
  */
 void Oscicontainer::frequency(double f) {
   // lfo signal container
-  if (this->isLFO==true) {
+  if (isLFO==true) {
     lfoSaw->frequency(f);
     lfoSquare->frequency(f);
     lfoSin->frequency(f);
@@ -198,7 +202,7 @@ void Oscicontainer::setADSRState(int status) {
 /* set adsr status on or off
  */
 void Oscicontainer::setADSRStatus(bool status) {
-  this->ADSRStatus = status;
+  ADSRStatus = status;
 }
 
 /* set lfo type
@@ -206,7 +210,7 @@ void Oscicontainer::setADSRStatus(bool status) {
  * Type 1: Saw, Type 2: Square
  */
 void Oscicontainer::setLFOtype(int Type) {
-	this->type = Type;
+	type = Type;
 	Oscicontainer::amplitude(0);
 }
 
@@ -215,10 +219,10 @@ void Oscicontainer::setLFOtype(int Type) {
  * the audible signal amplitude for all signals add up together yet
  */
 double Oscicontainer::getCurrentAmpl() {
-  if (this->isLFO==true) {
-    if(this->type ==1) 
+  if (isLFO==true) {
+    if(type ==1) 
       return lfoSaw->getCurrentAmpl();
-    else if (this->type ==2) 
+    else if (type ==2) 
       return lfoSquare->getCurrentAmpl();
     else 
       return lfoSin->getCurrentAmpl();

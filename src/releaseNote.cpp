@@ -21,7 +21,7 @@ void releaseNote::gate(int gate) {
 /* get the current state of the envelope
  */
 int releaseNote::getState() {
-    return this->state;
+    return state;
 }
 
 /* reset the envelope with preset values

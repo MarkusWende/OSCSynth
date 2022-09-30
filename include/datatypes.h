@@ -6,7 +6,8 @@
 /* struct for the osc double message
  * type: 'f' -> double (float), type of the osc message value
  */
-struct dMess {
+struct dMess
+{
     std::string type;
     std::string path;
     double val;
@@ -15,7 +16,8 @@ struct dMess {
 /* struct for the osc integer message
  * type: 'i' -> integer, type of the osc message value
  */
-struct iMess {
+struct iMess
+{
     std::string type;
     std::string path;
     int val;
@@ -24,7 +26,8 @@ struct iMess {
 /* struct for the osc char message
  * type: 's' -> char, type of the osc message value
  */
-struct sMess {
+struct sMess
+{
     std::string type;
     std::string path;
     char val;
@@ -37,7 +40,8 @@ struct sMess {
  * stamp = time stamp
  * hasBeenProcessed = whether the midi event is processed or not
  */
-struct midiMessage {
+struct midiMessage
+{
 	int byte1;
 	int byte2;
 	double byte3;

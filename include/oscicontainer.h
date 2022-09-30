@@ -41,13 +41,15 @@ private:
 	bool isLFO;
 	// lfo type
 	int type;
+	// sample frequency
+	int fs_;
 
 
 public:
 	// Constructor for the audible signal Container
 	Oscicontainer(uint32_t fs);
 	// Constructor for the lfo signal container
-	Oscicontainer(int type, double f);
+	Oscicontainer(uint32_t fs, int type, double f);
 	
 
 	// Setters

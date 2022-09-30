@@ -1,7 +1,7 @@
 /**
  * @file adsr.h
  * @author Markus Wende and Robert Pelzer
- * @brief ADSR class represents the envelope and shapes the sound over time.
+ * @brief ADSR class represents the envelope of a synthesizer, which shapes the sound over time.
  */
 
 #pragma once
@@ -9,7 +9,8 @@
 #include <math.h>
 
 // states of the ADSR
-enum noteState {
+enum noteState
+{
     NOTE_OFF = 0,                       /**< ADSR is off. */
     ATTACK = 1,                         /**< ADSR is in attack state. */
     DECAY = 2,                          /**< ADSR is in decay state. */
@@ -17,7 +18,8 @@ enum noteState {
     RELEASE = 4                         /**< ADSR is in release state. */
 };
 
-class ADSR {
+class ADSR
+{
 private:
 
     int     state_;                     /**< State of the ADSR. */
@@ -31,8 +33,8 @@ private:
     
 public:
     // CONSTRUCTEUR & DESCTRUCTOR
-	ADSR(void);
-    ~ADSR(void);
+	ADSR();
+    ~ADSR();
 
     /**
      * @brief   Inline process function, which returns the value which the signal is muliplied with.
@@ -43,59 +45,59 @@ public:
      *              release_time_
      * @return Return the output as a float.
      */
-	float Process(void);
+	float Process();
 
     /**
      * @brief Reset or init the ADSR.
      * @return Return void.
      */
-    void Reset(void);
+    void Reset();
 
     // GETTERS
     /**
      * @brief Set the attack time.
      * @return Return the output as a float.
      */
-    float   GetOutput(void)     { return output_; };
+    float   GetOutput()     { return output_; };
 
     /**
      * @brief Set the attack time.
      * @return Return the state of the ADSR as an int.
      */
-    int     GetState(void)      { return state_; };
+    int     GetState()      { return state_; };
 
     // SETTERS
     /**
      * @brief Set the attack time.
-     * @param t attack time range from 1 to 99.
+     * @param t attack time, as a float, range from 1.0f to 99.0f.
      * @return Return void.
      */
     void    SetAttack(float t)      { attack_time_ = t; };
 
     /**
      * @brief Set the attack time.
-     * @param t decay time range from 1 to 99.
+     * @param t decay time, as a float, range from 1.0f to 99.0f.
      * @return Return void.
      */
     void    SetDecay(float t)       { decay_time_ = t; };
 
     /**
      * @brief Set the attack time.
-     * @param t release time range from 1 to 99.
+     * @param t release time, as a float, range from 1.0f to 99.0f.
      * @return Return void.
      */
     void    SetRelease(float t)     { release_time_ = t; };
 
     /**
      * @brief Set the sustain level.
-     * @param level sustain level range from 1 to 99.
+     * @param level sustain level, as a float, range from 1.0f to 99.0f.
      * @return Return void.
      */
     void    SetSustain(float level) { sustain_level_ = level; };
 
     /**
-     * @brief Set the state.
-     * @param state .
+     * @brief Set the state. See \ref noteState
+     * @param state The state of the ADSR, e.g. can be noteState::NOTE_OFF, noteState::ATTACK etc.
      * @return Return void.
      */
     void    SetState(int state)     { state_ = state; };

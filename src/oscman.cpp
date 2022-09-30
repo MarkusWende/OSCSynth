@@ -1,14 +1,14 @@
 #include "oscman.h"
 #include <fstream>
 #include <string>
-using namespace std;
+#include <aixlog.hpp>
 
 /* Error handler
  */
 void
 error(int num, const char *msg, const char *path)
 {
-    printf("liblo server error %d in path %s: %s\n", num, path, msg);
+    LOG(ERROR) << "liblo server error " << num << "in path " << path << ": " << msg << "\n";
     fflush(stdout);
 }
 
@@ -17,24 +17,12 @@ error(int num, const char *msg, const char *path)
  */
 OscMan::OscMan()
 {
-    // osc server thread object
-	lo_server_thread st = lo_server_thread_new("50000", error);
-    // Add the callback handler to the server!
-	lo_server_thread_add_method(st, NULL, NULL, double_callback, this);
-	// start server thread
-    lo_server_thread_start(st);
-    std::cout << "Started OSC Server!" << std::endl;
+    init("50000");
 }
 
 OscMan::OscMan(const char* port)
 {
-    // osc server thread object
-	lo_server_thread st = lo_server_thread_new(port, error);
-    // Add the callback handler to the server!
-	lo_server_thread_add_method(st, NULL, NULL, double_callback, this);
-	// start server thread
-    lo_server_thread_start(st);
-    std::cout << "Started OSC Server!" << std::endl;
+    init(port);
 }
 
 /* Callback Handler
@@ -48,9 +36,10 @@ OscMan::double_callback(    const char *path,
                             lo_message data,
                             void *user_data )
 {
+    // Unused parameter
     (void)argc;
     (void)data;
-    
+
     // Converts between types using a combination of implicit and user-defined conversions
     auto statCast = static_cast<OscMan*>(user_data);
 
@@ -136,4 +125,17 @@ std::string OscMan::getLastType() {
         return s;
     } else
         return "empty";
+}
+
+// PRIVATE
+void
+OscMan::init(const char* port)
+{
+    // osc server thread object
+	lo_server_thread st = lo_server_thread_new(port, error);
+    // Add the callback handler to the server!
+	lo_server_thread_add_method(st, NULL, NULL, double_callback, this);
+	// start server thread
+    lo_server_thread_start(st);
+    LOG(INFO) << "Started OSC Server!\n";
 }

@@ -4,7 +4,6 @@
 
 #include "sawtoothwave.h"
 
-using namespace std;
 // Constructor
 Sawtoothwave::Sawtoothwave(double f, double a, double p,  int fS)
 {

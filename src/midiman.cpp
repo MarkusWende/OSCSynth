@@ -3,19 +3,18 @@
 
 //  The Code was edited in certain areas by Robert Pelzer and Markus Wende
 
-
 #include "midiman.h"
 
-using namespace std;
+#include <aixlog.hpp>
 
-
-vector<unsigned char>  a;
+std::vector<unsigned char>  a;
 // vector to buffer the incoming data from rt midi
-vector<unsigned char>  buffer;
+std::vector<unsigned char>  buffer;
 // vector to safe the time instances
-vector<double>  Zeit;
+std::vector<double>  Zeit;
 
-MidiMan::MidiMan() {
+MidiMan::MidiMan()
+{
 
     // rtmidid intit
 	RtMidi::Api api = RtMidi::UNSPECIFIED;
@@ -32,16 +31,19 @@ MidiMan::MidiMan() {
     midiin->ignoreTypes( false, false, false );
 	isVerbose = false;
 
-	cout << "Started Midi Server!" << endl;
+    LOG(INFO) << "Started Midi Server!\n";
 
 }
 
-void MidiMan::setVerbose() {
+void
+MidiMan::setVerbose()
+{
     isVerbose = true;
-
 }
 
-midiMessage MidiMan::get_rtmidi() {
+midiMessage
+MidiMan::get_rtmidi()
+{
 	midiMessage mm = {-1,-1,-1, 0, false};
     
     int nBytes = 1;
@@ -54,14 +56,16 @@ midiMessage MidiMan::get_rtmidi() {
 		nBytes = a.size();
 
         /// only do something if bytes are received
-        if(nBytes!=0) {      
-            
+        if (nBytes!=0)
+        {      
+
 			/// only give feedback if 'verbose-mode' is active
-            if(isVerbose == true  ) {
-                std::cout << "received " << nBytes << "Bytes: " ;
+            if (isVerbose == true)
+            {
+                LOG(DEBUG) << "received " << nBytes << "Bytes: " ;
 
                 for (int i=0; i<nBytes; i++ )
-                    std::cout <<  i << " = " << (int)a[i] << " -- " ;
+                    LOG(DEBUG) <<  i << " = " << (int)a[i] << " -- " ;
 
             }
 
@@ -99,9 +103,9 @@ midiMessage MidiMan::get_rtmidi() {
 // FLUSH the buffer
 //////////////////////////////////////////////////////////////////
 
-void MidiMan::flushProcessedMessages() {
-
+void
+MidiMan::flushProcessedMessages()
+{
    buffer.clear();
-
 }
 

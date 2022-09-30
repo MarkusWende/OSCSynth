@@ -5,7 +5,7 @@
 
 #include "osc_synth.h"
 
-//#define DEBUG
+#include <aixlog.hpp>
 
 OSCSynth::OSCSynth() : JackCpp::AudioIO("OSCSynth", 0,1) {
 	reserveInPorts(2);
@@ -18,19 +18,27 @@ OSCSynth::OSCSynth() : JackCpp::AudioIO("OSCSynth", 0,1) {
 
 	ring_buffer_out_ = new JackCpp::RingBuffer<float>(nframes*8, true);
 
-	std::cout << "fs: " << fs << " Hz";
-	std::cout << " || buffer size: " << nframes << " samples" << endl;
+	LOG(INFO) << "fs: " << fs << " Hz.\n";
+	LOG(INFO) << "buffer size: " << nframes << " samples.\n";
 
 	// Osclillator Containers for all available playable notes are created here
-	osci = new Oscicontainer *[7];
+	//osci = new Oscicontainer *[7];
 
-	osci[0] = new Oscicontainer(fs);
-	osci[1] = new Oscicontainer(fs);
-	osci[2] = new Oscicontainer(fs);
-	osci[3] = new Oscicontainer(fs);
-	osci[4] = new Oscicontainer(fs);
-	osci[5] = new Oscicontainer(fs);
-	osci[6] = new Oscicontainer(fs);
+	// osci[0] = new Oscicontainer(fs);
+	// osci[1] = new Oscicontainer(fs);
+	// osci[2] = new Oscicontainer(fs);
+	// osci[3] = new Oscicontainer(fs);
+	// osci[4] = new Oscicontainer(fs);
+	// osci[5] = new Oscicontainer(fs);
+	// osci[6] = new Oscicontainer(fs);
+
+	osci.insert(std::make_pair(0, new Oscicontainer(fs)));
+	osci.insert(std::make_pair(1, new Oscicontainer(fs)));
+	osci.insert(std::make_pair(2, new Oscicontainer(fs)));
+	osci.insert(std::make_pair(3, new Oscicontainer(fs)));
+	osci.insert(std::make_pair(4, new Oscicontainer(fs)));
+	osci.insert(std::make_pair(5, new Oscicontainer(fs)));
+	osci.insert(std::make_pair(6, new Oscicontainer(fs)));
 
 	// osc manager is created
 	osc = new OscMan("50000");
@@ -40,7 +48,7 @@ OSCSynth::OSCSynth() : JackCpp::AudioIO("OSCSynth", 0,1) {
 	// the filter object is created
 	filter= new Biquad(0, 0.3, 0.2, 1.0);
 	// creates the lfo oscillator
-	lfo= new Oscicontainer(0, 1);
+	lfo= new Oscicontainer(fs, 0, 1);
 	// disortion object is created
 	distortion = new Distortion();
 
@@ -121,7 +129,7 @@ void OSCSynth::midiHandler()
 		///////////////////
 		// note-on procedure
 		///////////////////
-        if(val1==144)
+        if(val1 == 144)
 		{
 
             //if all oscillators are being used, kill oldest
@@ -189,7 +197,7 @@ void OSCSynth::midiHandler()
         ///////////////////
 		// note-off procedure (val1 = 128)
 		///////////////////    
-        if(val1==128 )
+        if(val1 == 128 )
 		{
 
         	//find the oscillator that plays the frequency refering to the note-off order
@@ -215,17 +223,17 @@ void OSCSynth::midiHandler()
  
         }
             
-#ifdef DEBUG
-	if (val1>=0)
-		std::cout << "Frei: " << freeOsci.size() << " Zeit: " << t_tracking << "Counter: " << counter << endl;
-#endif // DEBUG
+#ifdef __OSCSYNTH_DEBUG__
+	if (val1 >= 0)
+		LOG(DEBUG) << "Free: " << freeOsci.size() << "\tTime: " << t_tracking << "\tCounter: " << counter << "\n";
+#endif // __OSCSYNTH_DEBUG__
 }
 
 
 // OSC Handler receives messegas from OSC manager and hands them over to Setters
 void OSCSynth::oscHandler() {
 
-  	double val;
+  	auto val = 0.0;
 
   	// determine the osc message type and use the according getter method 
   	// (intiger = i, float= f, string =s)
@@ -233,11 +241,12 @@ void OSCSynth::oscHandler() {
 	
 	if (type != "empty")
 	{
-	  	if (type== "f") val =  osc->getLastDouble();
-
-	  	else if (type== "i") val =  osc->getLastInt();
-
-	  	else if  (type== "s") val =  osc->getLastChar();
+	  	if (type== "f")
+			val =  osc->getLastDouble();
+	  	else if (type== "i")
+			val =  osc->getLastInt();
+	  	else if  (type== "s")
+			val =  osc->getLastChar();
 
 	  	auto path = osc->getLastPath();
 
@@ -245,95 +254,53 @@ void OSCSynth::oscHandler() {
 		pathOld = path;
 		valOld = val;
 
-		// display osc messages
-		cout<<val<<path<<"Type:"<<type<<endl;
+#ifdef __OSCSYNTH_DEBUG__
+	// display osc messages
+	LOG(DEBUG) << "/Val:" << val << "/Path:" << path << "/Type:" << type << "\n";
+#endif // __OSCSYNTH_DEBUG__
 
 		////////////////////////////////////////////////////////
 		// this section sends osc messages to according setters
 		///////////////////////////////////////////////////////
-		if (path.compare("/SineAmpl") == 0) {
-
+		if (path.compare("/SineAmpl") == 0)
 			setAllSineAmpl(val);
-			//cout << "OSC01 Ampl: " << val	<< endl;
-		}
-		
-		if (path.compare("/SawAmpl") == 0) {
-			//cout << "OSC02 Ampl: " << val	<< endl;
+		else if (path.compare("/SawAmpl") == 0)
 			setAllSawAmpl(val);
-		}
-		if (path.compare("/SquareAmpl") == 0) {
-			//cout << "SqureAmpl: " << val << endl;
+		else if (path.compare("/SquareAmpl") == 0)
 			setAllSquareAmpl(val);
-		}
-
-		if (path.compare("/NoiseAmpl") == 0) {
+		else if (path.compare("/NoiseAmpl") == 0)
 			setAllNoiseAmpl(val);
-
+	    else if (path.compare("/LFO_Q") == 0)
+	      	filter->SetQ(val);
+		else if (path.compare("/Filter_Type") == 0)
+		{
+			filterType ft = (filterType)std::round(val);
+	      	filter->SetType(ft);
 		}
-		
-	    if (path.compare("/LFO_Q") == 0) {
-	      	filter->setQ(val);
-		}
-			
-		if (path.compare("/Filter_Type") == 0) {
-	      	filter->setType((int)val);
-		}
-			
-		if (path.compare("/Filter_Gain") == 0) {
-	      	filter->setPeakGain(val);
-		}
-			
-		if (path.compare("/LFO_Freq") == 0) {
+		else if (path.compare("/Filter_Gain") == 0)
+	      	filter->SetPeakGain(val);
+		else if (path.compare("/LFO_Freq") == 0)
 	    	lfo->frequency(val);
-	    }
-
-	    if (path.compare("/LFO_Type") == 0) {
+	    else if (path.compare("/LFO_Type") == 0)
 	      	lfo->setLFOtype((int)val);
-		}
-
-		if (path.compare("/Distortion_Gain") == 0) {
-	      	distortion->setGain((int)val);
-		}
-
-		if (path.compare("/Filter_Status") == 0) {
-			if ((int)val == 1) filterStatus = true;
-			else filterStatus = false;
-		}
-
-		if (path.compare("/ADSR_Status") == 0) {
-
+		else if (path.compare("/Distortion_Gain") == 0)
+	      	SetGain(val);// Using general gain for the distortion fader.. //distortion->setGain((int)val);
+		else if (path.compare("/Filter_Status") == 0)
+			filterStatus = (int)val;
+		else if (path.compare("/ADSR_Status") == 0)
 			setAllADSRStatus(val);
-			
-		}
-
-		if (path.compare("/ADSR_Sustain_Level") == 0) {
+		else if (path.compare("/ADSR_Sustain_Level") == 0)
 			setAllADSRSustainLevel(val);
-		}
-
-		if (path.compare("/ADSR_Attack_Time") == 0) {
-
+		else if (path.compare("/ADSR_Attack_Time") == 0)
 	    	setAllADSRAttackTime(val);
-		}
-
-		if (path.compare("/ADSR_Release_Time") == 0) {
+		else if (path.compare("/ADSR_Release_Time") == 0)
 			setAllADSRReleaseTime(val);
-		}
-
-		if (path.compare("/ADSR_Decay_Time") == 0) {
-
+		else if (path.compare("/ADSR_Decay_Time") == 0)
 			setAllADSRDecayTime(val);
-		}
-
-		if (path.compare("/Preset") == 0) {
-
+		else if (path.compare("/Preset") == 0)
 			presets(int(val));
-
-		}
-
-
 	}
-	
-	
+		
 	usleep(500);
 }
 
@@ -481,7 +448,7 @@ void OSCSynth::lfoHandler() {
 	if (lfo_value > (lfo_oldValue + lfo_step) || lfo_value < (lfo_oldValue - lfo_step) ) { 
       
 		//change Cutoff of Filter when lfo_value changes
-    	filter->setFc(lfo_value);
+    	filter->SetFc(lfo_value);
 
 
       	lfo_oldValue=lfo_value;
@@ -512,9 +479,9 @@ void OSCSynth::presets(int preset) {
 			
 			//Biquad settings
 			filterStatus = true;
-			filter->setType(5);
+			filter->SetType(filterType::LOWSHELF);
 			//filter->setQ(1);
-			filter->setPeakGain(100);
+			filter->SetPeakGain(100);
 
 			//lfo settings
 			lfo->setLFOtype(0);
@@ -544,8 +511,8 @@ void OSCSynth::presets(int preset) {
 			
 			//Biquad settings
 			filterStatus = true;
-			filter->setType(2);
-			filter->setQ(0.01);
+			filter->SetType(filterType::BANDPASS);
+			filter->SetQ(0.01);
 			//filter->setPeakGain(100);
 
 			//lfo settings
@@ -577,9 +544,9 @@ void OSCSynth::presets(int preset) {
 			
 			//Biquad settings
 			filterStatus = true;
-			filter->setType(6);
+			filter->SetType(filterType::HIGHSHELF);
 			//filter->setQ(0.01);
-			filter->setPeakGain(15);
+			filter->SetPeakGain(15);
 
 			//lfo settings
 			lfo->setLFOtype(2);
@@ -610,8 +577,8 @@ void OSCSynth::presets(int preset) {
 			
 			//Biquad settings
 			filterStatus = true;
-			filter->setType(0);
-			filter->setQ(0.5);
+			filter->SetType(filterType::LOWPASS);
+			filter->SetQ(0.5);
 			//filter->setPeakGain(15);
 
 			//lfo settings
@@ -643,8 +610,8 @@ void OSCSynth::presets(int preset) {
 			
 			//Biquad settings
 			filterStatus = true;
-			filter->setType(1);
-			filter->setQ(0.09);
+			filter->SetType(filterType::HIGHPASS);
+			filter->SetQ(0.09);
 			//filter->setPeakGain(15);
 
 			//lfo settings
@@ -669,19 +636,18 @@ OSCSynth::process()
 		std::vector<float> data;
     	for(size_t frameCNT = 0; frameCNT  < dataSize; frameCNT++)
 		{
-			float sample = 0.0f;
+			auto sample = 		osci[0]->getNextSample() +
+								osci[1]->getNextSample() +
+								osci[2]->getNextSample() +
+								osci[3]->getNextSample() +
+								osci[4]->getNextSample() +
+								osci[5]->getNextSample() +
+								osci[6]->getNextSample();
 
-			sample =   (osci[0]->getNextSample() +
-						osci[1]->getNextSample() + 
-						osci[2]->getNextSample() +
-						osci[3]->getNextSample() +
-						osci[4]->getNextSample() +
-						osci[5]->getNextSample() +
-						osci[6]->getNextSample()) / 7.0;
-		
-
+			sample = sample / 7.0 * gain_;
+			
 			if(filterStatus)
-				sample = filter->process(sample);
+				sample = filter->Process(sample);
 		
 			// Commented out, because it makes to much artifacts
 			//sample = distortion->process(sample); 
@@ -689,7 +655,7 @@ OSCSynth::process()
 			// rotate lfo oscillator to next step
 			lfo->getNextSample();
 
-			data.push_back(sample);
+			data.push_back((float)sample);
 		}
 		ring_buffer_out_->write(data.data(), dataSize);
     }

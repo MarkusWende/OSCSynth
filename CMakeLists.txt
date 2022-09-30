@@ -7,6 +7,10 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_BUILD_TYPE "Debug")
 
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+  add_definitions(-D__OSCSYNTH_DEBUG__)
+endif ()
+
 set(THIRD_PARTY_DIR "external")
 set(MAIN_SOURCE_DIR "src")
 set(MAIN_INCLUDE_DIR "include")
@@ -30,6 +34,10 @@ include_directories(${JACKCPP_DIR}/include)
 # jackaudio
 set(JACKAUDIO_DIR ${THIRD_PARTY_DIR}/jackaudio)
 include_directories(${JACKAUDIO_DIR})
+
+# AixLOG
+set(AIXLOG_DIR ${THIRD_PARTY_DIR}/aixlog)
+include_directories(${AIXLOG_DIR}/include)
 
 add_library(
     app

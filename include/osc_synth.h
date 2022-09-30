@@ -3,6 +3,8 @@
 #include <jackaudioio.hpp>
 #include <algorithm>
 #include <unistd.h>
+#include <map>
+#include <memory>
 
 #include "oscicontainer.h"
 #include "oscman.h"
@@ -11,8 +13,6 @@
 #include "sinusoid.h"
 #include "distortion.h"
 #include "adsr.h"
-
-using namespace std;
 
 //Preset Numbers
 enum presetnumber{
@@ -27,8 +27,7 @@ enum presetnumber{
 class OSCSynth: public JackCpp::AudioIO {
 
 private:
-
-	Oscicontainer **osci;
+	std::map<int, std::unique_ptr<Oscicontainer>> osci;
 	OscMan *osc;
 
 	MidiMan *midi;
@@ -40,6 +39,7 @@ private:
 
 	jack_nframes_t fs;
 	jack_nframes_t nframes;
+	double gain_;
 
 	// variables for midi handling
 	double t_tracking; //time tracker
@@ -47,15 +47,15 @@ private:
 	size_t maxAnzahl_Osci;// max number of availible oscillators
 
 	// vecors for midi handling
-	vector<int> Noten;
-	vector<int> freeOsci;
-	vector<double> timetracker;
+	std::vector<int> Noten;
+	std::vector<int> freeOsci;
+	std::vector<double> timetracker;
 
 	// variables for osc handling
 	double valOld;
-	string typeOld;
-	string pathOld;
-	double lfo_oldValue=0;
+	std::string typeOld;
+	std::string pathOld;
+	double lfo_oldValue = 0.0;
 
 	// Ring buffer output
 	JackCpp::RingBuffer<float>* ring_buffer_out_;
@@ -89,6 +89,7 @@ public:
 	void setAllADSRAttackTime(double val);
 	void setAllADSRReleaseTime(double val);
 	void setAllADSRDecayTime(double val);
+	void SetGain(double gain) { gain_ = gain; };
 	void process();
 
 };

@@ -1,6 +1,9 @@
-//
-//  Biquad.cpp
-//
+/**
+ * @file adsr.h
+ * @author Markus Wende and Robert Pelzer
+ * @brief Biquad class implementation.
+ */
+
 //  Created by Nigel Redmon on 11/24/12
 //  EarLevel Engineering: earlevel.com
 //  Copyright 2012 Nigel Redmon
@@ -34,169 +37,189 @@
 // However, we undid this rise of gain to be able to implement a general distortion class. 
 // This had the effect that the peak gain didn´t increase the signals volume, but in praxis has a similar effect as Q for the other filters.
 
-
-
 #include "Biquad.h"
+
 #include <iostream> 
 #include <unistd.h>
+#include <aixlog.hpp>
 
 Biquad::Biquad() {
-    type = bq_type_lowpass;//bq_type_lowpass;
-    a0 = 1.0;
-    a1 = a2 = b1 = b2 = 0.0;
-    Fc = 0.50;
-    Q = 0.707;
-    peakGain = 0.0;
-    z1 = z2 = 0.0;
+    type_ = filterType::LOWPASS;
+    a0_ = 1.0;
+    a1_ = a2_ = b1_ = b2_ = 0.0;
+    fc_ = 0.50;
+    q_ = 0.0;
+    SetPeakGain(0.0);
+    z1_ = z2_ = 0.0;
 }
 
-Biquad::Biquad(int type, double Fc, double Q, double peakGainDB) {
-    setBiquad(type, Fc, Q, peakGainDB);
-    z1 = z2 = 0.0;
+Biquad::Biquad(int type, double fc, double q, double peakGain)
+{
+    type_ = type;
+    a0_ = 1.0;
+    a1_ = a2_ = b1_ = b2_ = 0.0;
+    fc_ = fc;
+    q_ = q;
+    SetPeakGain(peakGain);
+    z1_ = z2_ = 0.0;
 }
 
-Biquad::~Biquad() {
+Biquad::~Biquad()
+{
 }
 
-void Biquad::setType(int type) {
-    this->type = type;
-    calcBiquad();
+void
+Biquad::SetType(filterType type)
+{
+    type_ = type;
+    calc_biquad();
 
     //  reduce gain for peak, highshelf and lowshelf
     //  This leads to a reduction of the volume, however a high peakGain then works similar to the Q factor
-    if(type==bq_type_peak || type==bq_type_lowshelf || type==bq_type_highshelf) setGainReduce(1); 
-    else setGainReduce(0);
+    if(type_ == filterType::PEAK || type_ == filterType::LOWSHELF || type_ == filterType::HIGHSHELF)
+        SetGainReduce(1); 
+    else
+        SetGainReduce(0);
 }
 
-void Biquad::setQ(double Q) {
-    this->Q = Q;
-    calcBiquad();
+void
+Biquad::SetQ(double Q)
+{
+    q_ = Q;
+    calc_biquad();
 }
 
-void Biquad::setFc(double Fc) {
-    this->Fc = Fc;
-    calcBiquad();
+void
+Biquad::SetFc(double Fc)
+{
+    fc_ = Fc;
+    calc_biquad();
 }
 
-void Biquad::status() {
-
-    std::cout<<"Filter Type: "<<type<<std::endl;
+void
+Biquad::Status()
+{
+    LOG(INFO) << "Filter Type: " << type_ << "\n";
 }
 
-void Biquad::setPeakGain(double peakGainDB) {
-    this->peakGain = peakGainDB;
-    calcBiquad();
-}
-    
-void Biquad::setBiquad(int type, double Fc, double Q, double peakGainDB) {
-    this->type = type;
-    this->Q = Q;
-    this->Fc = Fc;
-    setPeakGain(peakGainDB);
+void
+Biquad::SetPeakGain(double peakGain)
+{
+    peak_gain_ = peakGain;
+    calc_biquad();
 }
 
 // turn on the gain reduction for applicable filter types
-void Biquad::setGainReduce(int on) {
-
-    if (on==1) {
-      gain_reduce=true;  
-    }
-    else gain_reduce=false;
+void
+Biquad::SetGainReduce(int on)
+{
+    if (on==1)
+        gain_reduce_ = true;  
+    else
+        gain_reduce_ =false;
 }
 
-void Biquad::calcBiquad(void) {
+void
+Biquad::calc_biquad(void) {
     double norm;
-    double V = pow(10, fabs(peakGain) / 20.0);
-    double K = tan(M_PI * Fc);
-    switch (this->type) {
-        case bq_type_lowpass:
-            norm = 1 / (1 + K / Q + K * K);
-            a0 = K * K * norm;
-            a1 = 2 * a0;
-            a2 = a0;
-            b1 = 2 * (K * K - 1) * norm;
-            b2 = (1 - K / Q + K * K) * norm;
+    double V = std::pow(10, std::fabs(peak_gain_) / 20.0);
+    double K = std::tan(M_PI * fc_);
+    switch (type_)
+    {
+        case filterType::LOWPASS:
+            norm = 1 / (1 + K / q_ + K * K);
+            a0_ = K * K * norm;
+            a1_ = 2 * a0_;
+            a2_ = a0_;
+            b1_ = 2 * (K * K - 1) * norm;
+            b2_ = (1 - K / q_ + K * K) * norm;
             break;
             
-        case bq_type_highpass:
-            norm = 1 / (1 + K / Q + K * K);
-            a0 = 1 * norm;
-            a1 = -2 * a0;
-            a2 = a0;
-            b1 = 2 * (K * K - 1) * norm;
-            b2 = (1 - K / Q + K * K) * norm;
+        case filterType::HIGHPASS:
+            norm = 1 / (1 + K / q_ + K * K);
+            a0_ = 1 * norm;
+            a1_ = -2 * a0_;
+            a2_ = a0_;
+            b1_ = 2 * (K * K - 1) * norm;
+            b2_ = (1 - K / q_ + K * K) * norm;
             break;
             
-        case bq_type_bandpass:
-            norm = 1 / (1 + K / Q + K * K);
-            a0 = K / Q * norm;
-            a1 = 0;
-            a2 = -a0;
-            b1 = 2 * (K * K - 1) * norm;
-            b2 = (1 - K / Q + K * K) * norm;
+        case filterType::BANDPASS:
+            norm = 1 / (1 + K / q_ + K * K);
+            a0_ = K / q_ * norm;
+            a1_ = 0;
+            a2_ = -a0_;
+            b1_ = 2 * (K * K - 1) * norm;
+            b2_ = (1 - K / q_ + K * K) * norm;
             break;
             
-        case bq_type_notch:
-            norm = 1 / (1 + K / Q + K * K);
-            a0 = (1 + K * K) * norm;
-            a1 = 2 * (K * K - 1) * norm;
-            a2 = a0;
-            b1 = a1;
-            b2 = (1 - K / Q + K * K) * norm;
+        case filterType::NOTCH:
+            norm = 1 / (1 + K / q_ + K * K);
+            a0_ = (1 + K * K) * norm;
+            a1_ = 2 * (K * K - 1) * norm;
+            a2_ = a0_;
+            b1_ = a1_;
+            b2_ = (1 - K / q_ + K * K) * norm;
             break;
             
-        case bq_type_peak:
-            if (peakGain >= 0) {    // boost
-                norm = 1 / (1 + 1/Q * K + K * K);
-                a0 = (1 + V/Q * K + K * K) * norm;
-                a1 = 2 * (K * K - 1) * norm;
-                a2 = (1 - V/Q * K + K * K) * norm;
-                b1 = a1;
-                b2 = (1 - 1/Q * K + K * K) * norm;
+        case filterType::PEAK:
+            if (peak_gain_ >= 0)
+            {    // boost
+                norm = 1 / (1 + 1/q_ * K + K * K);
+                a0_ = (1 + V/q_ * K + K * K) * norm;
+                a1_ = 2 * (K * K - 1) * norm;
+                a2_ = (1 - V/q_ * K + K * K) * norm;
+                b1_ = a1_;
+                b2_ = (1 - 1/q_ * K + K * K) * norm;
             }
-            else {    // cut
-                norm = 1 / (1 + V/Q * K + K * K);
-                a0 = (1 + 1/Q * K + K * K) * norm;
-                a1 = 2 * (K * K - 1) * norm;
-                a2 = (1 - 1/Q * K + K * K) * norm;
-                b1 = a1;
-                b2 = (1 - V/Q * K + K * K) * norm;
+            else
+            {    // cut
+                norm = 1 / (1 + V/q_ * K + K * K);
+                a0_ = (1 + 1/q_ * K + K * K) * norm;
+                a1_ = 2 * (K * K - 1) * norm;
+                a2_ = (1 - 1/q_ * K + K * K) * norm;
+                b1_ = a1_;
+                b2_ = (1 - V/q_ * K + K * K) * norm;
             }
             break;
-        case bq_type_lowshelf:
-            if (peakGain >= 0) {    // boost
+        case filterType::LOWSHELF:
+            if (peak_gain_ >= 0)
+            {   // boost
                 norm = 1 / (1 + sqrt(2) * K + K * K);
-                a0 = (1 + sqrt(2*V) * K + V * K * K) * norm;
-                a1 = 2 * (V * K * K - 1) * norm;
-                a2 = (1 - sqrt(2*V) * K + V * K * K) * norm;
-                b1 = 2 * (K * K - 1) * norm;
-                b2 = (1 - sqrt(2) * K + K * K) * norm;
+                a0_ = (1 + sqrt(2*V) * K + V * K * K) * norm;
+                a1_ = 2 * (V * K * K - 1) * norm;
+                a2_ = (1 - sqrt(2*V) * K + V * K * K) * norm;
+                b1_ = 2 * (K * K - 1) * norm;
+                b2_ = (1 - sqrt(2) * K + K * K) * norm;
             }
-            else {    // cut
+            else
+            {   // cut
                 norm = 1 / (1 + sqrt(2*V) * K + V * K * K);
-                a0 = (1 + sqrt(2) * K + K * K) * norm;
-                a1 = 2 * (K * K - 1) * norm;
-                a2 = (1 - sqrt(2) * K + K * K) * norm;
-                b1 = 2 * (V * K * K - 1) * norm;
-                b2 = (1 - sqrt(2*V) * K + V * K * K) * norm;
+                a0_ = (1 + sqrt(2) * K + K * K) * norm;
+                a1_ = 2 * (K * K - 1) * norm;
+                a2_ = (1 - sqrt(2) * K + K * K) * norm;
+                b1_ = 2 * (V * K * K - 1) * norm;
+                b2_ = (1 - sqrt(2*V) * K + V * K * K) * norm;
             }
             break;
-        case bq_type_highshelf:
-            if (peakGain >= 0) {    // boost
+        case filterType::HIGHSHELF:
+            if (peak_gain_ >= 0)
+            {   // boost
                 norm = 1 / (1 + sqrt(2) * K + K * K);
-                a0 = (V + sqrt(2*V) * K + K * K) * norm;
-                a1 = 2 * (K * K - V) * norm;
-                a2 = (V - sqrt(2*V) * K + K * K) * norm;
-                b1 = 2 * (K * K - 1) * norm;
-                b2 = (1 - sqrt(2) * K + K * K) * norm;
+                a0_ = (V + sqrt(2*V) * K + K * K) * norm;
+                a1_ = 2 * (K * K - V) * norm;
+                a2_ = (V - sqrt(2*V) * K + K * K) * norm;
+                b1_ = 2 * (K * K - 1) * norm;
+                b2_ = (1 - sqrt(2) * K + K * K) * norm;
             }
-            else {    // cut
+            else
+            {   // cut
                 norm = 1 / (V + sqrt(2*V) * K + K * K);
-                a0 = (1 + sqrt(2) * K + K * K) * norm;
-                a1 = 2 * (K * K - 1) * norm;
-                a2 = (1 - sqrt(2) * K + K * K) * norm;
-                b1 = 2 * (K * K - V) * norm;
-                b2 = (V - sqrt(2*V) * K + K * K) * norm;
+                a0_ = (1 + sqrt(2) * K + K * K) * norm;
+                a1_ = 2 * (K * K - 1) * norm;
+                a2_ = (1 - sqrt(2) * K + K * K) * norm;
+                b1_ = 2 * (K * K - V) * norm;
+                b2_ = (V - sqrt(2*V) * K + K * K) * norm;
             }
             break;
     }
