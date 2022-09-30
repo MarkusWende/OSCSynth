@@ -1,53 +1,45 @@
-#ifndef DATATYPES_H
-#define DATATYPES_H
+#pragma once
 
 #include <string>
 
-/* struct for the osc double message
- * type: 'f' -> double (float), type of the osc message value
+/**
+ * @brief Struct for osc double messages.
  */
 struct dMess
 {
-    std::string type;
-    std::string path;
-    double val;
+    std::string type;       /**< Message value type. */
+    std::string path;       /**< Message path / command. */
+    double val;             /**< Message data. */
 };
 
-/* struct for the osc integer message
- * type: 'i' -> integer, type of the osc message value
+/**
+ * @brief Struct for osc integer messages.
  */
 struct iMess
 {
-    std::string type;
-    std::string path;
-    int val;
+    std::string type;       /**< Message value type. */
+    std::string path;       /**< Message path / command. */
+    int val;                /**< Message data. */
 };
 
-/* struct for the osc char message
- * type: 's' -> char, type of the osc message value
+/**
+ * @brief Struct for osc char messages.
  */
 struct sMess
 {
-    std::string type;
-    std::string path;
-    char val;
+    std::string type;       /**< Message value type. */
+    std::string path;       /**< Message path / command. */
+    char val;               /**< Message data. */
 };
 
-/* struct for the midi message
- * byte1 = status byte
- * byte2 = data byte 1
- * byte3 = data byte 2
- * stamp = time stamp
- * hasBeenProcessed = whether the midi event is processed or not
+/**
+ * @brief Struct for midi messages.
  */
 struct midiMessage
 {
-	int byte1;
-	int byte2;
-	double byte3;
-	double stamp;
-	bool hasBeenProcessed;
-
+	int byte1;              /**< Status byte. */
+	int byte2;              /**< Data byte 1. */
+	double byte3;           /**< Data byte 2. */
+	double stamp;           /**< Time stamp. */
+	bool hasBeenProcessed;  /**< Whether the midi event is processed or not. */
 };
-
-#endif // DATATYPES_H

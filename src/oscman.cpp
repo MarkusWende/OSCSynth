@@ -44,26 +44,31 @@ OscMan::double_callback(    const char *path,
     auto statCast = static_cast<OscMan*>(user_data);
 
     // message double (float)
-    if (std::string(types)=="f") {
+    if (std::string(types)=="f")
+    {
     	dMess tmpD;
       	tmpD.type = types;
       	tmpD.path = path; 
       	tmpD.val = argv[0]->f;
       	statCast->dMessages.push_back(tmpD);
     // message integer
-    } else if (std::string(types)=="i") {
+    }
+    else if (std::string(types)=="i")
+    {
         iMess tmp;
         tmp.type = types;
         tmp.path = path;
         tmp.val = argv[0]->i;
         statCast->iMessages.push_back(tmp);
     // message char
-    }	else if (std::string(types)=="s") {
+    }
+    else if (std::string(types)=="s")
+    {
         sMess tmps;
         tmps.type = types;
         tmps.path = path;
         tmps.val = argv[0]->s;
-        statCast->sMessages.push_back(tmps);         
+        statCast->sMessages.push_back(tmps);
     }
 
     // store all information

@@ -41,7 +41,9 @@
 
 #include <math.h>
 
-// Filter types
+/**
+ * @brief Filter types of the biquad filter.
+ */
 enum filterType
 {
     LOWPASS = 0,                /**< The filter is a lowpass. */
@@ -125,8 +127,8 @@ public:
     
 private:
     /**
-     * @brief Set the filter quality factor (Q) of the filter
-     * @param q The Q value (quality factor) as a double
+     * @brief   Calculate the parameters of the filter depending on the type that was
+     *          choosen.
      * @return Return void.
      */
     void calc_biquad();
