@@ -77,6 +77,8 @@ OSCSynth::OSCSynth() : JackCpp::AudioIO("OSCSynth", 0,1)
 	typeOld = "";
 	pathOld = "";
 
+	setAllSineAmpl(1.0);
+
 }
 
 OSCSynth::~OSCSynth()
