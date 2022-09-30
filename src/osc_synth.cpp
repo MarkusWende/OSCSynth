@@ -7,7 +7,8 @@
 
 #include <aixlog.hpp>
 
-OSCSynth::OSCSynth() : JackCpp::AudioIO("OSCSynth", 0,1) {
+OSCSynth::OSCSynth() : JackCpp::AudioIO("OSCSynth", 0,1)
+{
 	reserveInPorts(2);
 	reserveOutPorts(2);
 
@@ -15,6 +16,8 @@ OSCSynth::OSCSynth() : JackCpp::AudioIO("OSCSynth", 0,1) {
 	fs = getSampleRate();
 	// delivers the buffer size
 	nframes = getBufferSize();
+	// default gain
+	gain_ = 1.0;
 
 	ring_buffer_out_ = new JackCpp::RingBuffer<float>(nframes*8, true);
 
@@ -46,9 +49,9 @@ OSCSynth::OSCSynth() : JackCpp::AudioIO("OSCSynth", 0,1) {
 	midi = new MidiMan();
 
 	// the filter object is created
-	filter= new Biquad(0, 0.3, 0.2, 1.0);
+	filter = new Biquad(0, 0.01, 0.2, 1.0);
 	// creates the lfo oscillator
-	lfo= new Oscicontainer(fs, 0, 1);
+	lfo = new Oscicontainer(fs, 0, 1);
 	// disortion object is created
 	distortion = new Distortion();
 
@@ -273,10 +276,7 @@ void OSCSynth::oscHandler() {
 	    else if (path.compare("/LFO_Q") == 0)
 	      	filter->SetQ(val);
 		else if (path.compare("/Filter_Type") == 0)
-		{
-			filterType ft = (filterType)std::round(val);
-	      	filter->SetType(ft);
-		}
+	      	filter->SetType((filterType)std::round(val));
 		else if (path.compare("/Filter_Gain") == 0)
 	      	filter->SetPeakGain(val);
 		else if (path.compare("/LFO_Freq") == 0)
@@ -298,7 +298,7 @@ void OSCSynth::oscHandler() {
 		else if (path.compare("/ADSR_Decay_Time") == 0)
 			setAllADSRDecayTime(val);
 		else if (path.compare("/Preset") == 0)
-			presets(int(val));
+			presets((int)std::round(val));
 	}
 		
 	usleep(500);

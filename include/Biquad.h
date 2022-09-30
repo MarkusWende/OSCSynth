@@ -60,56 +60,56 @@ public:
      * @param type Type of the filter, like filterType::LOWPASS, filterType::PEAK etc.
      * @return Return void.
      */
-    void    SetType(filterType type);
+    void SetType(filterType type);
 
     /**
      * @brief Set the filter quality factor (Q) of the filter
      * @param q The Q value (quality factor) as a double
      * @return Return void.
      */
-    void    SetQ(double q);
+    void SetQ(double q);
 
     /**
      * @brief Set the filter quality factor (Q) of the filter
      * @param q The Q value (quality factor) as a double
      * @return Return void.
      */
-    void    SetFc(double fc);
+    void SetFc(double fc);
 
     /**
      * @brief Set the filter quality factor (Q) of the filter
      * @param q The Q value (quality factor) as a double
      * @return Return void.
      */
-    void    SetPeakGain(double peakGain);
+    void SetPeakGain(double peakGain);
 
     /**
      * @brief Set the filter quality factor (Q) of the filter
      * @param q The Q value (quality factor) as a double
      * @return Return void.
      */
-    void    SetGainReduce(int on);
+    void SetGainReduce(int on);
 
     /**
      * @brief Set the filter quality factor (Q) of the filter
      * @param q The Q value (quality factor) as a double
      * @return Return void.
      */
-    void    SetBiquad(double peakGain);
+    void SetBiquad(double peakGain);
 
     /**
      * @brief Set the filter quality factor (Q) of the filter
      * @param q The Q value (quality factor) as a double
      * @return Return void.
      */
-    float   Process(float in);
+    float Process(float in);
 
     /**
      * @brief Set the filter quality factor (Q) of the filter
      * @param q The Q value (quality factor) as a double
      * @return Return void.
      */
-    void    Status();
+    void Status();
     
 private:
     /**

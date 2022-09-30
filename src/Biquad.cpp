@@ -43,7 +43,8 @@
 #include <unistd.h>
 #include <aixlog.hpp>
 
-Biquad::Biquad() {
+Biquad::Biquad()
+{
     type_ = filterType::LOWPASS;
     a0_ = 1.0;
     a1_ = a2_ = b1_ = b2_ = 0.0;
