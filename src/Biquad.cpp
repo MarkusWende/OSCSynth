@@ -1,5 +1,5 @@
 /**
- * @file adsr.h
+ * @file Biquad.cpp
  * @author Markus Wende and Robert Pelzer
  * @brief Biquad class implementation.
  */

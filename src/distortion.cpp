@@ -1,27 +1,41 @@
-// This class is a distortion filter
-//  distortion.cpp
-
-//This filter class  is general gain or distortion filter that is applied to the post-filtered signal. 
-// The Schetzen formula is used to create distortion or gain
+/**
+ * @file distortion.cpp
+ * @author Markus Wende and Robert Pelzer
+ * @brief Distortion class implementation.
+ */
 
 #include "distortion.h"
 
-
-Distortion::Distortion() {
-    gain=1;
-
+Distortion::Distortion()
+{
+    drive_ = 1.0;
+    range_ = 0.8;
+    blend_ = 0.8;
 }
 
-Distortion::Distortion(int gain) {
-    setGain(gain);
-
+Distortion::Distortion(double drive)
+{
+    drive_ = drive;
 }
 
-Distortion::~Distortion() {
+Distortion::~Distortion()
+{
 }
 
-
-void Distortion::setGain(int gain) {
-    gain = gain;
+void
+Distortion::SetDrive(double drive)
+{
+    drive_ = drive;
 }
 
+void
+Distortion::SetRange(double range)
+{
+    range_ = range;
+}
+
+void
+Distortion::SetBlend(double blend)
+{
+    blend_ = blend;
+}

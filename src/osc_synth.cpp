@@ -55,8 +55,8 @@ OSCSynth::OSCSynth() : JackCpp::AudioIO("OSCSynth", 0,1)
 	// disortion object is created
 	distortion = new Distortion();
 
-
 	filterStatus = false;
+	distortion_status_ = false;
 
 	midi->flushProcessedMessages();
 
@@ -285,10 +285,18 @@ void OSCSynth::oscHandler() {
 	    	lfo->frequency(val);
 	    else if (path.compare("/LFO_Type") == 0)
 	      	lfo->setLFOtype((int)val);
-		else if (path.compare("/Distortion_Gain") == 0)
-	      	SetGain(val);// Using general gain for the distortion fader.. //distortion->setGain((int)val);
+		else if (path.compare("/Gain") == 0)
+	      	SetGain(val);
+		else if (path.compare("/Distortion_Drive") == 0)
+			distortion->SetDrive(val);
+		else if (path.compare("/Distortion_Range") == 0)
+			distortion->SetRange(val);
+		else if (path.compare("/Distortion_Blend") == 0)
+			distortion->SetBlend(val);
 		else if (path.compare("/Filter_Status") == 0)
 			filterStatus = (int)val;
+		else if (path.compare("/Distortion_Status") == 0)
+			distortion_status_ = (int)val;
 		else if (path.compare("/ADSR_Status") == 0)
 			setAllADSRStatus(val);
 		else if (path.compare("/ADSR_Sustain_Level") == 0)
@@ -490,7 +498,7 @@ void OSCSynth::presets(int preset) {
 			lfo->frequency(2);
 
 			//gain (distortion) settings
-			distortion->setGain(50);
+			distortion->SetDrive(3.0);
 
 
 		break;
@@ -522,7 +530,7 @@ void OSCSynth::presets(int preset) {
 			lfo->frequency(2);
 
 			//gain (distortion) settings
-			distortion->setGain(2);
+			distortion->SetDrive(2.0);
 
 
 		break;
@@ -555,7 +563,7 @@ void OSCSynth::presets(int preset) {
 			lfo->frequency(5);
 
 			//gain (distortion) settings
-			distortion->setGain(5);
+			distortion->SetDrive(5.0);
 
 
 		break;
@@ -588,7 +596,7 @@ void OSCSynth::presets(int preset) {
 			lfo->frequency(3);
 
 			//gain (distortion) settings
-			distortion->setGain(5);
+			distortion->SetDrive(5.0);
 
 
 		break;
@@ -621,7 +629,7 @@ void OSCSynth::presets(int preset) {
 			lfo->frequency(8);
 
 			//gain (distortion) settings
-			distortion->setGain(30);
+			distortion->SetDrive(3.0);
 
 
 		break;
@@ -648,11 +656,13 @@ OSCSynth::process()
 
 			sample = sample / 7.0 * gain_;
 			
+			// apply filter
 			if(filterStatus)
 				sample = filter->Process(sample);
 		
-			// Commented out, because it makes to much artifacts
-			//sample = distortion->process(sample); 
+			// apply distortion
+			if (distortion_status_)
+				sample = distortion->Process(sample); 
 
 			// rotate lfo oscillator to next step
 			lfo->getNextSample();

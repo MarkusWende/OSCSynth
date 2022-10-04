@@ -36,6 +36,7 @@ private:
 	Distortion* distortion;
 
 	bool filterStatus;
+	bool distortion_status_;
 
 	jack_nframes_t fs;
 	jack_nframes_t nframes;

@@ -1,5 +1,5 @@
 /**
- * @file adsr.h
+ * @file Biquad.h
  * @author Markus Wende and Robert Pelzer
  * @brief Biquad class represents the filter element of a synthesizer, which the sound over frequency.
  */
@@ -58,7 +58,7 @@ enum filterType
 class Biquad
 {
 public:
-    // CONSTRUCTEUR
+    // CONSTRUCTOR
     /**
      * @brief Standard Constructor.
      */
@@ -74,6 +74,9 @@ public:
     Biquad(int type, double fc, double q, double peakGain);
 
     // DESCTRUCTOR
+    /**
+     * @brief Standard Destructor.
+     */
     ~Biquad();
 
     // SETTER
@@ -141,10 +144,11 @@ private:
 };
 
 /**
- * @brief Inline function to process a value.
- * @return Return double.
+ * @brief Implementation of the Inline function Process.
  */
-inline double Biquad::Process(double in)
+inline
+double
+Biquad::Process(double in)
 {
     auto out = in * a0_ + z1_;
     z1_ = in * a1_ + z2_ - b1_ * out;
